@@ -1,0 +1,40 @@
+
+/Users/priyanshu-ai/Desktop/Fundthekids/talent-network-frontend/src/app/explore/page.tsx
+    7:54   warning  'GraduationCap' is defined but never used  @typescript-eslint/no-unused-vars
+   41:23   error    Unexpected any. Specify a different type   @typescript-eslint/no-explicit-any
+  109:104  error    Unexpected any. Specify a different type   @typescript-eslint/no-explicit-any
+  156:23   error    Unexpected any. Specify a different type   @typescript-eslint/no-explicit-any
+
+/Users/priyanshu-ai/Desktop/Fundthekids/talent-network-frontend/src/app/page.tsx
+  6:70  warning  'CheckCircle2' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/priyanshu-ai/Desktop/Fundthekids/talent-network-frontend/src/components/AIAssistant.tsx
+  35:19  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/priyanshu-ai/Desktop/Fundthekids/talent-network-frontend/src/components/dashboard/ImpactWidget.tsx
+  21:23  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/priyanshu-ai/Desktop/Fundthekids/talent-network-frontend/src/components/dashboard/SponsorDashboard.tsx
+  84:18  warning  'err' is defined but never used           @typescript-eslint/no-unused-vars
+  84:23  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/priyanshu-ai/Desktop/Fundthekids/talent-network-frontend/src/context/AuthContext.tsx
+  30:21  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/Users/priyanshu-ai/Desktop/Fundthekids/talent-network-frontend/src/context/AuthContext.tsx:30:21
+  28 |             if (token && storedUser) {
+  29 |                 try {
+> 30 |                     setUser(JSON.parse(storedUser));
+     |                     ^^^^^^^ Avoid calling setState() directly within an effect
+  31 |                 } catch {
+  32 |                     localStorage.removeItem('user');
+  33 |                     localStorage.removeItem('access_token');  react-hooks/set-state-in-effect
+
+✖ 10 problems (7 errors, 3 warnings)
+

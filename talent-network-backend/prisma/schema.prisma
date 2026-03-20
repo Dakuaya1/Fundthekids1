@@ -1,0 +1,191 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  ADMIN
+  SPONSOR
+  NGO
+  VOLUNTEER
+  GUARDIAN
+}
+
+enum PlanCategory {
+  EDUCATION
+  LODGING
+  SPORTS
+  SPECIAL_GIFT
+  OTHER
+}
+
+enum PlanType {
+  MONTHLY
+  ONE_TIME
+}
+
+enum PlanStatus {
+  ACTIVE
+  INACTIVE
+  COMPLETED
+  CANCELLED
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REFUNDED
+}
+
+enum ValidationStatus {
+  PENDING
+  VERIFIED
+  REJECTED
+}
+
+model User {
+  id           String        @id @default(uuid())
+  email        String        @unique
+  passwordHash String
+  role         Role
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  sponsor      Sponsor?
+  volunteer    Volunteer?
+  ngo          NGO?
+  
+  userBadges   UserBadge[]
+  activityLogs ActivityLog[]
+  progressReports ProgressReport[] // As uploader
+}
+
+model NGO {
+  id             String   @id @default(uuid())
+  userId         String   @unique
+  user           User     @relation(fields: [userId], references: [id])
+  name           String
+  region         String
+  verifiedStatus Boolean  @default(false)
+  
+  children       Child[]
+}
+
+model Volunteer {
+  id             String   @id @default(uuid())
+  userId         String   @unique
+  user           User     @relation(fields: [userId], references: [id])
+  assignedRegion String
+  impactScore    Int      @default(0)
+}
+
+model Sponsor {
+  id              String            @id @default(uuid())
+  userId          String            @unique
+  user            User              @relation(fields: [userId], references: [id])
+  impactScore     Int               @default(0)
+  leaderboardRank Int?
+  weeklyImpactScore Int             @default(0)
+  
+  plans           SponsorshipPlan[]
+  payments        Payment[]
+}
+
+model Child {
+  id             String            @id @default(uuid())
+  name           String
+  dob            DateTime
+  talentCategory String
+  ngoId          String
+  ngo            NGO               @relation(fields: [ngoId], references: [id])
+  guardianId     String?           // Maps to a User ID (Guardian role)
+  isActive       Boolean           @default(true)
+  city           String            @default("")
+  location       String            @default("")
+  pleaVideoUrl   String?
+  mediaUrls      String[]
+  
+  reports        ProgressReport[]
+  plans          SponsorshipPlan[]
+}
+
+model SponsorshipPlan {
+  id        String       @id @default(uuid())
+  childId   String
+  child     Child        @relation(fields: [childId], references: [id])
+  sponsorId String
+  sponsor   Sponsor      @relation(fields: [sponsorId], references: [id])
+  
+  category  PlanCategory
+  type      PlanType
+  amount    Float
+  status    PlanStatus   @default(ACTIVE)
+
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+  
+  payments  Payment[]
+}
+
+model Payment {
+  id          String          @id @default(uuid())
+  sponsorId   String
+  sponsor     Sponsor         @relation(fields: [sponsorId], references: [id])
+  planId      String
+  plan        SponsorshipPlan @relation(fields: [planId], references: [id])
+  
+  amount      Float
+  currency    String          @default("USD")
+  status      PaymentStatus   @default(PENDING)
+  paymentDate DateTime        @default(now())
+}
+
+model ProgressReport {
+  id               String           @id @default(uuid())
+  childId          String
+  child            Child            @relation(fields: [childId], references: [id])
+  uploadedById     String
+  uploader         User             @relation(fields: [uploadedById], references: [id])
+  
+  description      String
+  mediaUrl         String?
+  aiSummary        String?
+  validationStatus ValidationStatus @default(PENDING)
+  date             DateTime         @default(now())
+}
+
+model Badge {
+  id         String      @id @default(uuid())
+  name       String
+  criteria   String
+  
+  userBadges UserBadge[]
+}
+
+model UserBadge {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  badgeId   String
+  badge     Badge    @relation(fields: [badgeId], references: [id])
+  awardedAt DateTime @default(now())
+}
+
+model ActivityLog {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  action    String
+  entityId  String?
+  timestamp DateTime @default(now())
+}
+
+model AdminAiReport {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  report    Json
+}

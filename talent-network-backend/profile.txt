@@ -1,0 +1,1 @@
+{"impactScore":350,"badges":[{"id":"First Pledge","name":"First Pledge","criteria":"Make your first sponsorship pledge"}]}

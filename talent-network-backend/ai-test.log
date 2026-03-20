@@ -1,0 +1,28 @@
+
+Testing Query: "Which children need urgent funding right now?"
+Status: 500
+Response: {
+  "statusCode": 500,
+  "message": "Internal server error"
+}
+
+Testing Query: "Give me the platform health summary"
+Status: 500
+Response: {
+  "statusCode": 500,
+  "message": "Internal server error"
+}
+
+Testing Query: "Identify inactive sponsors"
+Status: 500
+Response: {
+  "statusCode": 500,
+  "message": "Internal server error"
+}
+
+Testing Query: "Show pending NGO verification risks"
+Status: 500
+Response: {
+  "statusCode": 500,
+  "message": "Internal server error"
+}
