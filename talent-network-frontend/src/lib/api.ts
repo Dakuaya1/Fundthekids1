@@ -2,8 +2,10 @@ import axios from 'axios';
 import http from 'http';
 import https from 'https';
 
+const baseURL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+
 const api = axios.create({
-    baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001',
+    baseURL,
     // Maintain a persistent connection for all dashboard widgets firing concurrently
     httpAgent: new http.Agent({ keepAlive: true }),
     httpsAgent: new https.Agent({ keepAlive: true }),
