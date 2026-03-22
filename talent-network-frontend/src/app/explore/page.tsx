@@ -112,12 +112,12 @@ export default function ExplorePage() {
 // Complex Kid Card Component
 function KidCard({ child, isAuthenticated, router }: { child: Child, isAuthenticated: boolean, router: ReturnType<typeof useRouter> }) {
     const [currentMediaIdx, setCurrentMediaIdx] = useState(0);
-    // Sponsoring state
-    const [amount, setAmount] = useState(1000); // default 1000
-    const [planCategory, setPlanCategory] = useState("EDUCATION");
+    const [amount, setAmount] = useState(100);
     const [pledging, setPledging] = useState(false);
     const [successMsg, setSuccessMsg] = useState('');
     const [errorMsg, setErrorMsg] = useState('');
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isSupporting, setIsSupporting] = useState(false);
 
     // Pre-process media: combine video(s) and images if they exist
     const allMedia: { type: 'video' | 'image', url: string }[] = [];
@@ -131,31 +131,36 @@ function KidCard({ child, isAuthenticated, router }: { child: Child, isAuthentic
     const nextMedia = () => setCurrentMediaIdx((prev) => (prev + 1) % allMedia.length);
     const prevMedia = () => setCurrentMediaIdx((prev) => (prev - 1 + allMedia.length) % allMedia.length);
 
-    const handlePledge = async (e: React.FormEvent) => {
-        e.preventDefault();
-
+    const openPledgeModal = () => {
         if (!isAuthenticated) {
             router.push('/login?redirect=/explore');
             return;
         }
+
+        setErrorMsg('');
+        setSuccessMsg('');
+        setIsModalOpen(true);
+    };
+
+    const handlePledge = async (e: React.FormEvent) => {
+        e.preventDefault();
 
         setPledging(true);
         setErrorMsg('');
         setSuccessMsg('');
 
         try {
-            const res = await api.post('/sponsorships/plan', {
+            const res = await api.post('/sponsorships/pledge', {
                 childId: child.id,
-                category: planCategory,
-                type: 'MONTHLY',
                 amount: Number(amount)
             });
 
-            if (res.data?.checkoutUrl) {
-                window.location.href = res.data.checkoutUrl;
-            } else {
-                setSuccessMsg('Successfully pledged!');
-                setTimeout(() => setSuccessMsg(''), 3000);
+            if (res.data?.message) {
+                setIsSupporting(true);
+                setSuccessMsg('Thank you for supporting this child');
+                setTimeout(() => {
+                    setIsModalOpen(false);
+                }, 1200);
             }
         } catch (err: unknown) {
             const error = err as { response?: { data?: { message?: string } } };
@@ -235,62 +240,89 @@ function KidCard({ child, isAuthenticated, router }: { child: Child, isAuthentic
                     </div>
                 </div>
 
-                {/* Sponsorship Form Inline */}
-                <form onSubmit={handlePledge} className="flex flex-col gap-3 relative z-20 bg-slate-50 dark:bg-slate-800/50 p-4 rounded-2xl border border-slate-200/50 dark:border-slate-700/50 shadow-inner">
+                <div className="flex flex-col gap-3 relative z-20 bg-slate-50 dark:bg-slate-800/50 p-4 rounded-2xl border border-slate-200/50 dark:border-slate-700/50 shadow-inner">
                     <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-1 flex justify-between items-center">
-                        Choose Support Plan
-                        <span className="bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 px-2 py-0.5 rounded text-[10px]">Monthly</span>
+                        Demo Sponsorship
+                        <span className="bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 px-2 py-0.5 rounded text-[10px]">No Payment Gateway</span>
                     </h4>
-
-                    {/* Facility Selection Dropdown */}
-                    <div className="relative">
-                        <select
-                            value={planCategory}
-                            onChange={(e) => setPlanCategory(e.target.value)}
-                            className="w-full appearance-none bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white text-sm font-semibold rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-indigo-500 outline-none shadow-sm cursor-pointer"
-                        >
-                            <option value="EDUCATION">📚 Education & Mentorship</option>
-                            <option value="LODGING">🏠 Lodging & Sustenance</option>
-                            <option value="SPORTS">⚽ Sports & Athletics Equipment</option>
-                            <option value="SPECIAL_GIFT">🎁 Special Fund / Materials</option>
-                        </select>
-                        <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-slate-500">
-                            <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" /></svg>
-                        </div>
-                    </div>
-
-                    {/* Amount Input */}
-                    <div className="relative flex items-center">
-                        <span className="absolute left-4 font-bold text-slate-500">$</span>
-                        <input
-                            type="number"
-                            min="10"
-                            step="10"
-                            value={amount}
-                            onChange={(e) => setAmount(Number(e.target.value))}
-                            className="w-full pl-8 pr-4 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-bold rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none shadow-sm"
-                            placeholder="Amount/mo"
-                        />
-                        <span className="absolute right-4 text-xs font-semibold text-slate-400">/mo</span>
-                    </div>
-
-                    {/* Feedback Messages */}
-                    {errorMsg && <div className="text-red-500 text-xs font-bold text-center mt-1 animate-pulse">{errorMsg}</div>}
+                    <p className="text-sm text-slate-600 dark:text-slate-400">
+                        Simulate a support pledge for this child with a simple sponsor action.
+                    </p>
                     {successMsg && <div className="text-emerald-500 text-xs font-bold text-center mt-1 flex items-center justify-center gap-1"><CheckCircle2 className="w-3 h-3" /> {successMsg}</div>}
-
-                    {/* Submit Button */}
                     <button
-                        type="submit"
-                        disabled={pledging || !!successMsg}
-                        className="mt-1 w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold py-3 rounded-xl shadow-lg shadow-indigo-500/30 flex items-center justify-center gap-2 transition-all active:scale-95 disabled:opacity-50 disabled:active:scale-100"
+                        type="button"
+                        onClick={openPledgeModal}
+                        disabled={isSupporting}
+                        className="mt-1 w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold py-3 rounded-xl shadow-lg shadow-indigo-500/30 flex items-center justify-center gap-2 transition-all active:scale-95 disabled:opacity-60 disabled:active:scale-100"
                     >
-                        {pledging ? <Loader2 className="w-5 h-5 animate-spin" /> : <><Heart className="w-4 h-4 fill-white/20" /> Pledge ${amount}</>}
+                        <Heart className="w-4 h-4 fill-white/20" />
+                        {isSupporting ? 'You are supporting this child' : 'Support this child'}
                     </button>
                     {!isAuthenticated && (
-                        <p className="text-[10px] text-center text-slate-500 mt-1 font-medium">You will be asked to log in or create a sponsor account first.</p>
+                        <p className="text-[10px] text-center text-slate-500 mt-1 font-medium">Log in as a sponsor to create a demo pledge.</p>
                     )}
-                </form>
+                </div>
             </div>
+
+            <AnimatePresence>
+                {isModalOpen && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 p-4 backdrop-blur-sm"
+                    >
+                        <motion.div
+                            initial={{ scale: 0.96, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            exit={{ scale: 0.96, opacity: 0 }}
+                            className="glass-card w-full max-w-md rounded-[2rem] p-6 shadow-2xl"
+                        >
+                            <h3 className="text-2xl font-bold text-slate-900 dark:text-white">Support {child.name}</h3>
+                            <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
+                                Enter a demo pledge amount to simulate sponsorship without real payment processing.
+                            </p>
+
+                            <form onSubmit={handlePledge} className="mt-6 space-y-4">
+                                <div>
+                                    <label className="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-300">Pledge amount</label>
+                                    <div className="relative flex items-center">
+                                        <span className="absolute left-4 font-bold text-slate-500">$</span>
+                                        <input
+                                            type="number"
+                                            min="10"
+                                            step="10"
+                                            value={amount}
+                                            onChange={(e) => setAmount(Number(e.target.value))}
+                                            className="w-full rounded-xl border border-slate-200 bg-white py-3 pl-8 pr-4 font-bold text-slate-900 outline-none transition focus:ring-2 focus:ring-indigo-500 dark:border-slate-700 dark:bg-slate-900 dark:text-white"
+                                        />
+                                    </div>
+                                </div>
+
+                                {errorMsg && <div className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm font-medium text-red-600 dark:border-red-900/40 dark:bg-red-900/20 dark:text-red-400">{errorMsg}</div>}
+                                {successMsg && <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-3 text-sm font-medium text-emerald-700 dark:border-emerald-900/40 dark:bg-emerald-900/20 dark:text-emerald-300">{successMsg}</div>}
+
+                                <div className="flex gap-3 pt-2">
+                                    <button
+                                        type="button"
+                                        onClick={() => setIsModalOpen(false)}
+                                        className="flex-1 rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-bold text-slate-700 transition hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button
+                                        type="submit"
+                                        disabled={pledging || isSupporting}
+                                        className="flex-1 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 px-4 py-3 text-sm font-bold text-white shadow-lg shadow-indigo-500/20 transition hover:from-indigo-700 hover:to-purple-700 disabled:opacity-60"
+                                    >
+                                        {pledging ? 'Processing...' : 'Confirm Pledge'}
+                                    </button>
+                                </div>
+                            </form>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </motion.div>
     );
 }

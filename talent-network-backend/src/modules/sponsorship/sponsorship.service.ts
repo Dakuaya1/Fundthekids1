@@ -1,8 +1,10 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../config/prisma.service';
 import { CreatePlanDto } from './dto/create-plan.dto';
+import { CreatePledgeDto } from './dto/create-pledge.dto';
 import { GamificationService } from '../gamification/gamification.service';
 import { PaymentEngineService } from '../payment-engine/payment-engine.service';
+import { PlanCategory, PlanStatus, PlanType } from '@prisma/client';
 
 @Injectable()
 export class SponsorshipService {
@@ -55,6 +57,43 @@ export class SponsorshipService {
     );
 
     return { plan, checkoutUrl };
+  }
+
+  async createPledge(userId: string, createPledgeDto: CreatePledgeDto) {
+    const sponsor = await this.prisma.sponsor.findUnique({
+      where: { userId },
+    });
+
+    if (!sponsor) {
+      throw new NotFoundException('Sponsor profile not found for this user');
+    }
+
+    const child = await this.prisma.child.findUnique({
+      where: { id: createPledgeDto.childId },
+    });
+
+    if (!child) {
+      throw new NotFoundException('Child not found');
+    }
+
+    await this.prisma.sponsorshipPlan.create({
+      data: {
+        childId: createPledgeDto.childId,
+        sponsorId: sponsor.id,
+        amount: createPledgeDto.amount,
+        status: PlanStatus.ACTIVE,
+        category: PlanCategory.EDUCATION,
+        type: PlanType.MONTHLY,
+      },
+    });
+
+    await this.gamificationService.awardPoints(
+      userId,
+      Math.floor(createPledgeDto.amount),
+      `Created Demo Pledge for ${createPledgeDto.amount} USD`,
+    );
+
+    return { message: 'Pledge successful' };
   }
 
   async getMyPlans(userId: string) {

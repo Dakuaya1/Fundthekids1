@@ -8,6 +8,7 @@ import {
 } from '@nestjs/common';
 import { SponsorshipService } from './sponsorship.service';
 import { CreatePlanDto } from './dto/create-plan.dto';
+import { CreatePledgeDto } from './dto/create-pledge.dto';
 import { JwtAuthGuard } from '../../core/guards/jwt-auth.guard';
 import { RolesGuard } from '../../core/guards/roles.guard';
 import { Roles } from '../../core/decorators/roles.decorator';
@@ -26,6 +27,13 @@ export class SponsorshipController {
   @ApiOperation({ summary: 'Create a new sponsorship plan for a child' })
   createPlan(@Request() req: any, @Body() createPlanDto: CreatePlanDto) {
     return this.sponsorshipService.createPlan(req.user.id, createPlanDto);
+  }
+
+  @Post('pledge')
+  @Roles(Role.SPONSOR)
+  @ApiOperation({ summary: 'Create a demo-safe sponsorship pledge for a child' })
+  createPledge(@Request() req: any, @Body() createPledgeDto: CreatePledgeDto) {
+    return this.sponsorshipService.createPledge(req.user.id, createPledgeDto);
   }
 
   @Get('my-plans')
