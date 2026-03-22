@@ -1,3 +1,4 @@
+import { ChildStatus } from '@prisma/client';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../config/prisma.service';
 import { AiEngineService } from '../ai-engine/ai-engine.service';
@@ -18,7 +19,7 @@ export class ChildrenService {
 
   async findAll() {
     return this.prisma.child.findMany({
-      where: { isActive: true },
+      where: { isActive: true, status: ChildStatus.VERIFIED },
       include: { ngo: true },
     });
   }

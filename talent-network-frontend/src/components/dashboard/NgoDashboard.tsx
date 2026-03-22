@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import api from '@/lib/api';
 import { motion, Variants } from 'framer-motion';
-import { UserPlus, Users, Loader2, Calendar, FileText, CheckCircle2 } from 'lucide-react';
+import { UserPlus, Users, Loader2, Calendar, FileText, CheckCircle2, ShieldCheck } from 'lucide-react';
 
 interface Child {
     id: string;
@@ -9,6 +9,7 @@ interface Child {
     dob: string;
     talentCategory: string;
     isActive: boolean;
+    status: 'PENDING' | 'VERIFIED';
 }
 
 export default function NgoDashboard() {
@@ -32,6 +33,7 @@ export default function NgoDashboard() {
     const [reportContent, setReportContent] = useState('');
     const [reportSubmitting, setReportSubmitting] = useState(false);
     const [reportMsg, setReportMsg] = useState('');
+    const [verifyingChildId, setVerifyingChildId] = useState<string | null>(null);
 
     useEffect(() => {
         fetchChildren();
@@ -113,6 +115,18 @@ export default function NgoDashboard() {
         }
     };
 
+    const handleVerifyChild = async (childId: string) => {
+        try {
+            setVerifyingChildId(childId);
+            await api.post(`/ngo/verify-child/${childId}`);
+            await fetchChildren();
+        } catch (err) {
+            console.error('Failed to verify child', err);
+        } finally {
+            setVerifyingChildId(null);
+        }
+    };
+
     const containerVariants: Variants = {
         hidden: { opacity: 0 },
         visible: { opacity: 1, transition: { staggerChildren: 0.1 } }
@@ -138,7 +152,7 @@ export default function NgoDashboard() {
                         Onboarded Children
                     </h2>
                     <p className="text-slate-600 dark:text-slate-400 font-light max-w-xl">
-                        Manage the profiles of exceptionally gifted children and submit regular progress reports to keep sponsors updated.
+                        Manage child submissions, move verified profiles into public discovery, and submit regular progress reports to keep sponsors updated.
                     </p>
                 </div>
                 <button
@@ -158,6 +172,9 @@ export default function NgoDashboard() {
                     className="glass-card rounded-3xl p-8 border-l-4 border-l-blue-500 overflow-hidden"
                 >
                     <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-6">Child Onboarding Form</h3>
+                    <p className="mb-6 text-sm font-medium text-amber-700 dark:text-amber-300">
+                        New child profiles start in Pending Verification and stay hidden from Explore until they are approved.
+                    </p>
                     <form onSubmit={handleAddChild} className="space-y-6">
                         {formError && (
                             <div className="bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 p-4 rounded-xl text-sm border border-red-200 dark:border-red-800 font-medium">
@@ -289,6 +306,12 @@ export default function NgoDashboard() {
                                             <span className="px-3 py-1 inline-flex text-xs leading-5 font-bold uppercase tracking-wider rounded-full bg-white/50 dark:bg-slate-800/50 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 shadow-sm backdrop-blur-md">
                                                 {child.talentCategory}
                                             </span>
+                                            <span className={`px-3 py-1 inline-flex text-xs leading-5 font-bold uppercase tracking-wider rounded-full border shadow-sm backdrop-blur-md ${child.status === 'VERIFIED'
+                                                ? 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800'
+                                                : 'bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-800'
+                                                }`}>
+                                                {child.status === 'VERIFIED' ? 'Verified' : 'Pending Verification'}
+                                            </span>
                                             <p className={`px-3 py-1 inline-flex text-xs leading-5 font-bold rounded-full border shadow-sm backdrop-blur-md ${child.isActive ? 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800' : 'bg-slate-50 dark:bg-slate-900/30 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-800'}`}>
                                                 {child.isActive ? 'Active' : 'Inactive'}
                                             </p>
@@ -302,6 +325,16 @@ export default function NgoDashboard() {
                                             </p>
                                         </div>
                                         <div className="mt-4 flex items-center text-sm sm:mt-0">
+                                            {child.status === 'PENDING' && (
+                                                <button
+                                                    onClick={() => handleVerifyChild(child.id)}
+                                                    disabled={verifyingChildId === child.id}
+                                                    className="mr-3 inline-flex items-center justify-center px-4 py-2 border border-emerald-200 dark:border-emerald-900/50 shadow-sm text-sm font-bold rounded-xl text-emerald-700 dark:text-emerald-300 bg-emerald-50/60 dark:bg-emerald-900/20 hover:bg-emerald-100 dark:hover:bg-emerald-900/40 transition-all"
+                                                >
+                                                    <ShieldCheck className="w-4 h-4 mr-2" />
+                                                    {verifyingChildId === child.id ? 'Verifying...' : 'Verify Child'}
+                                                </button>
+                                            )}
                                             <button
                                                 onClick={() => setSelectedChildId(child.id)}
                                                 className="inline-flex items-center justify-center px-4 py-2 border border-blue-200 dark:border-blue-900/50 shadow-sm text-sm font-bold rounded-xl text-blue-700 dark:text-blue-300 bg-blue-50/50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/40 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all backdrop-blur-md"

@@ -5,6 +5,7 @@ import {
   Body,
   UseGuards,
   Request,
+  Param,
 } from '@nestjs/common';
 import { NgoService } from './ngo.service';
 import { CreateChildDto } from './dto/create-child.dto';
@@ -40,5 +41,12 @@ export class NgoController {
   @ApiOperation({ summary: 'Get all children managed by this NGO' })
   getChildren(@Request() req: any) {
     return this.ngoService.getChildren(req.user.id);
+  }
+
+  @Post('verify-child/:id')
+  @Roles(Role.NGO)
+  @ApiOperation({ summary: 'Mark one of this NGO child profiles as verified' })
+  verifyChild(@Request() req: any, @Param('id') childId: string) {
+    return this.ngoService.verifyChild(req.user.id, childId);
   }
 }

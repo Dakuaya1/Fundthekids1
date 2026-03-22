@@ -136,13 +136,25 @@ export default function Home() {
             </motion.p>
 
             <motion.div variants={itemVariants} className="mt-10 flex flex-col gap-4 sm:flex-row">
-              <Link href={isAuthenticated ? "/dashboard" : "/register"} className="primary-button w-full gap-3 px-8 py-4 text-lg sm:w-auto">
-                Start Supporting
+              <Link href="/explore" className="primary-button w-full gap-3 px-8 py-4 text-lg sm:w-auto">
+                Continue as Guest
                 <ArrowRight className="h-5 w-5" />
               </Link>
-              <Link href="/explore" className="secondary-button w-full gap-3 px-8 py-4 text-lg sm:w-auto dark:bg-slate-900/70 dark:text-slate-100 dark:hover:bg-slate-800">
-                Explore Prodigy Profiles
+              <Link href="/login" className="secondary-button w-full gap-3 px-8 py-4 text-lg sm:w-auto dark:bg-slate-900/70 dark:text-slate-100 dark:hover:bg-slate-800">
+                Login
               </Link>
+              <Link href={isAuthenticated ? "/dashboard" : "/register"} className="secondary-button w-full gap-3 px-8 py-4 text-lg sm:w-auto dark:bg-slate-900/70 dark:text-slate-100 dark:hover:bg-slate-800">
+                Sign Up
+              </Link>
+            </motion.div>
+
+            <motion.div variants={itemVariants} className="mt-6 glass-card panel-outline rounded-[1.8rem] p-5">
+              <p className="text-xs font-bold uppercase tracking-[0.22em] text-slate-500 dark:text-slate-400">Demo onboarding</p>
+              <div className="mt-3 flex flex-wrap items-center gap-3 text-sm text-slate-600 dark:text-slate-300">
+                <span className="rounded-full bg-white/70 px-4 py-2 font-semibold dark:bg-slate-900/70">Continue as Guest to view verified children</span>
+                <span className="rounded-full bg-white/70 px-4 py-2 font-semibold dark:bg-slate-900/70">Login for role-based dashboards</span>
+                <span className="rounded-full bg-white/70 px-4 py-2 font-semibold dark:bg-slate-900/70">Sign up to join the live workflow</span>
+              </div>
             </motion.div>
 
             <motion.div variants={itemVariants} className="mt-10 grid gap-4 sm:grid-cols-3">

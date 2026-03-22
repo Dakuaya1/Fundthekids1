@@ -1,3 +1,4 @@
+import { ChildStatus } from '@prisma/client';
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from './config/prisma.service';
 
@@ -11,7 +12,7 @@ export class AppService {
 
   async getShowcaseData() {
     const recentChildren = await this.prisma.child.findMany({
-      where: { isActive: true },
+      where: { isActive: true, status: ChildStatus.VERIFIED },
       take: 4,
       orderBy: { id: 'desc' },
       include: {

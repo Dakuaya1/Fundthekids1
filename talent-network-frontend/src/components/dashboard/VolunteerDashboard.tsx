@@ -7,12 +7,13 @@ interface ProgressReport {
     id: string;
     description: string;
     date: string;
-    validationStatus: 'PENDING' | 'APPROVED' | 'REJECTED';
+    validationStatus: 'PENDING' | 'VERIFIED' | 'REJECTED';
 }
 
 interface AssignedChild {
     id: string;
     name: string;
+    status: 'PENDING' | 'VERIFIED';
     ngo: { name: string; region: string };
     reports: ProgressReport[];
 }
@@ -37,7 +38,7 @@ export default function VolunteerDashboard() {
         }
     };
 
-    const handleVerifyReport = async (reportId: string, status: 'APPROVED' | 'REJECTED') => {
+    const handleVerifyReport = async (reportId: string, status: 'VERIFIED' | 'REJECTED') => {
         try {
             await api.post(`/volunteer/verify-report/${reportId}`, { status });
             // Optimistically update UI
@@ -45,7 +46,7 @@ export default function VolunteerDashboard() {
                 ...child,
                 reports: child.reports.filter(r => r.id !== reportId)
             })));
-            alert(`Report has been ${status.toLowerCase()}! You earned +10 Impact Score.`);
+            alert(status === 'VERIFIED' ? 'Report marked as reviewed. You earned +10 Impact Score.' : 'Report flagged for follow-up.');
         } catch (error) {
             console.error('Failed to verify report', error);
             alert('Failed to process verification.');
@@ -88,7 +89,7 @@ export default function VolunteerDashboard() {
                         Field Verification Tasks
                     </h2>
                     <p className="text-slate-600 dark:text-slate-400 mt-2 font-light max-w-xl">
-                        Review progress reports uploaded by NGOs in your assigned region. Approve accurate reports to release them to Sponsors.
+                        Review children and pending reports from your assigned region. Mark reports as reviewed to keep the verification queue moving.
                     </p>
                 </div>
                 <div className="text-right">
@@ -127,6 +128,12 @@ export default function VolunteerDashboard() {
                                     <p className="text-sm text-slate-500 flex items-center mt-1">
                                         Hosted by <strong className="ml-1 text-slate-700 dark:text-slate-300">{child.ngo.name}</strong> <span className="mx-2">•</span> {child.ngo.region}
                                     </p>
+                                    <span className={`mt-3 inline-flex rounded-full px-3 py-1 text-xs font-bold uppercase tracking-wide ${child.status === 'VERIFIED'
+                                        ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300'
+                                        : 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300'
+                                        }`}>
+                                        {child.status === 'VERIFIED' ? 'Verified' : 'Pending Verification'}
+                                    </span>
                                 </div>
                             </div>
                             <ul className="divide-y divide-slate-200/50 dark:divide-slate-700/50">
@@ -145,11 +152,11 @@ export default function VolunteerDashboard() {
                                             </div>
                                             <div className="flex flex-row md:flex-col gap-3 shrink-0 md:w-40 pt-1">
                                                 <button
-                                                    onClick={() => handleVerifyReport(report.id, 'APPROVED')}
+                                                    onClick={() => handleVerifyReport(report.id, 'VERIFIED')}
                                                     className="inline-flex items-center justify-center px-4 py-3 border border-transparent shadow-md shadow-emerald-500/20 text-sm font-bold rounded-xl text-white bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 flex-1 transition-all hover:-translate-y-0.5"
                                                 >
                                                     <CheckCircle2 className="w-4 h-4 mr-2" />
-                                                    Approve
+                                                    Mark Reviewed
                                                 </button>
                                                 <button
                                                     onClick={() => handleVerifyReport(report.id, 'REJECTED')}

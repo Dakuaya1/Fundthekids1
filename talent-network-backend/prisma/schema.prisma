@@ -47,6 +47,11 @@ enum ValidationStatus {
   REJECTED
 }
 
+enum ChildStatus {
+  PENDING
+  VERIFIED
+}
+
 model User {
   id           String        @id @default(uuid())
   email        String        @unique
@@ -100,6 +105,7 @@ model Child {
   name           String
   dob            DateTime
   talentCategory String
+  status         ChildStatus       @default(PENDING)
   ngoId          String
   ngo            NGO               @relation(fields: [ngoId], references: [id])
   guardianId     String?           // Maps to a User ID (Guardian role)

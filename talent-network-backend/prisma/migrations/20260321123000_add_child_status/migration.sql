@@ -1,0 +1,4 @@
+CREATE TYPE "ChildStatus" AS ENUM ('PENDING', 'VERIFIED');
+
+ALTER TABLE "Child"
+ADD COLUMN "status" "ChildStatus" NOT NULL DEFAULT 'PENDING';

@@ -54,11 +54,11 @@ export default function LoginPage() {
                         <div className="mt-8 grid grid-cols-2 gap-4">
                             <div className="glass-card panel-outline rounded-[1.75rem] p-5">
                                 <p className="text-sm font-semibold text-slate-500 dark:text-slate-400">Guest Access</p>
-                                <p className="mt-2 text-2xl font-bold text-slate-900 dark:text-white">Seeded Sponsor</p>
+                                <p className="mt-2 text-2xl font-bold text-slate-900 dark:text-white">Verified Explore</p>
                             </div>
                             <div className="glass-card panel-outline rounded-[1.75rem] p-5">
                                 <p className="text-sm font-semibold text-slate-500 dark:text-slate-400">Fast Path</p>
-                                <p className="mt-2 text-2xl font-bold text-slate-900 dark:text-white">One-click sign in</p>
+                                <p className="mt-2 text-2xl font-bold text-slate-900 dark:text-white">Demo sponsor login</p>
                             </div>
                         </div>
                     </div>
@@ -72,7 +72,7 @@ export default function LoginPage() {
                             Sign in to your dashboard
                         </h2>
                         <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
-                            Use your account credentials or the seeded sponsor shortcut.
+                            Use your account credentials or the seeded demo sponsor shortcut.
                         </p>
                     </div>
                 <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
@@ -125,7 +125,7 @@ export default function LoginPage() {
                                 setLoading(true);
                                 try {
                                     const response = await api.post('/auth/login', {
-                                        email: 'sponsor.john@example.com',
+                                        email: 'sponsor@demo.com',
                                         password: 'password123'
                                     });
                                     login(response.data.access_token, response.data.user);

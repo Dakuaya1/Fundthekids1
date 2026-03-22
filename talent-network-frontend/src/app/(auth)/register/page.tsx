@@ -138,7 +138,7 @@ export default function RegisterPage() {
                                 setLoading(true);
                                 try {
                                     const response = await api.post('/auth/login', {
-                                        email: 'sponsor.john@example.com',
+                                        email: 'sponsor@demo.com',
                                         password: 'password123'
                                     });
                                     login(response.data.access_token, response.data.user);

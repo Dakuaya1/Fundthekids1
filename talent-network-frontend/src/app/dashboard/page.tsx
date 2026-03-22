@@ -1,6 +1,7 @@
 'use client';
 
 import { useAuth } from '@/context/AuthContext';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
@@ -18,6 +19,14 @@ export default function DashboardPage() {
     const router = useRouter();
     const [loading, setLoading] = useState(true);
     const [paymentToast, setPaymentToast] = useState<{ type: 'success' | 'error', message: string } | null>(null);
+
+    const roleCopy = user?.role === 'NGO'
+        ? 'Review new child submissions, verify profiles, and maintain sponsor-ready updates.'
+        : user?.role === 'VOLUNTEER'
+            ? 'Work through your regional review queue and validate field reports.'
+            : user?.role === 'SPONSOR'
+                ? 'Explore verified children and sponsor the ones with the highest potential.'
+                : 'Access role-based workflows across the network.';
 
     useEffect(() => {
         if (authLoading) return;
@@ -115,6 +124,26 @@ export default function DashboardPage() {
                             <p className="mt-2 max-w-2xl text-lg text-blue-100/90 font-light">
                                 You are logged in as a <strong className="font-semibold text-white bg-white/20 px-3 py-1 rounded-full text-sm inline-block ml-1">{user?.role}</strong>
                             </p>
+                            <p className="mt-4 max-w-2xl text-base text-blue-100/80">
+                                {roleCopy}
+                            </p>
+                        </div>
+                        <div className="relative z-10 flex flex-wrap gap-3">
+                            {(user?.role === 'SPONSOR' || user?.role === 'NGO') && (
+                                <Link href="/explore" className="rounded-full bg-white/15 px-5 py-3 text-sm font-semibold text-white transition hover:bg-white/25">
+                                    Explore Verified Children
+                                </Link>
+                            )}
+                            {user?.role === 'VOLUNTEER' && (
+                                <span className="rounded-full bg-white/15 px-5 py-3 text-sm font-semibold text-white">
+                                    Review Queue Active
+                                </span>
+                            )}
+                            {user?.role === 'NGO' && (
+                                <span className="rounded-full bg-white/15 px-5 py-3 text-sm font-semibold text-white">
+                                    Verify Children
+                                </span>
+                            )}
                         </div>
                     </div>
                 </div>

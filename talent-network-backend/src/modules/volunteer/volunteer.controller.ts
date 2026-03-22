@@ -36,7 +36,7 @@ export class VolunteerController {
   @ApiBody({
     schema: {
       properties: {
-        status: { type: 'string', enum: ['APPROVED', 'REJECTED'] },
+        status: { type: 'string', enum: ['VERIFIED', 'REJECTED'] },
       },
     },
   })

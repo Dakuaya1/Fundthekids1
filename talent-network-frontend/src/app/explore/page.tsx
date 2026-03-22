@@ -13,6 +13,7 @@ interface Child {
     name: string;
     dob: string;
     talentCategory: string;
+    status: 'PENDING' | 'VERIFIED';
     city?: string;
     location?: string;
     pleaVideoUrl?: string;
@@ -77,13 +78,16 @@ export default function ExplorePage() {
             <header className="max-w-7xl mx-auto mb-16 text-center">
                 <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-indigo-200/50 dark:border-indigo-700/50 glass text-indigo-800 dark:text-indigo-200 font-medium mb-6 shadow-sm">
                     <Search className="w-4 h-4 text-indigo-500" />
-                    <span>Explore Talent Gallery</span>
+                    <span>Explore Verified Talent Gallery</span>
                 </motion.div>
                 <motion.h1 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="text-5xl md:text-6xl font-extrabold tracking-tight mb-6 text-slate-900 dark:text-white">
                     Discover and <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-purple-500">Sponsor</span>
                 </motion.h1>
                 <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }} className="text-xl text-slate-600 dark:text-slate-400 font-light max-w-3xl mx-auto">
-                    Browse verified profiles of gifted children. View their stories, talents, and plea videos, and choose exactly how you want to support them.
+                    Browse sponsor-ready profiles of gifted children that have already passed verification. Guests can explore freely, while signed-in sponsors can pledge instantly.
+                </motion.p>
+                <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }} className="mt-4 text-sm font-medium uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">
+                    Only verified children are shown here
                 </motion.p>
             </header>
 
@@ -206,6 +210,9 @@ function KidCard({ child, isAuthenticated, router }: { child: Child, isAuthentic
                 <div className="absolute top-4 right-4 z-10 flex flex-col gap-2 items-end">
                     <span className="px-3 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-widest bg-white/90 dark:bg-slate-900/90 text-indigo-600 dark:text-indigo-400 shadow-lg backdrop-blur-md">
                         {child.talentCategory}
+                    </span>
+                    <span className="px-3 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-widest bg-emerald-100/95 text-emerald-700 shadow-lg backdrop-blur-md dark:bg-emerald-900/80 dark:text-emerald-300">
+                        {child.status === 'VERIFIED' ? 'Verified' : 'Pending Verification'}
                     </span>
                 </div>
             </div>
