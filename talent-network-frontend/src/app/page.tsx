@@ -93,7 +93,7 @@ export default function Home() {
         className="absolute top-0 w-full z-50 px-6 py-6"
       >
         <div className="max-w-7xl mx-auto flex justify-between items-center glass px-6 py-4 rounded-3xl">
-          <BrandLogo priority imageClassName="text-2xl sm:text-3xl" />
+          <BrandLogo imageClassName="text-2xl sm:text-3xl" />
           <div className="hidden sm:flex items-center space-x-6">
             {isAuthenticated ? (
               <Link href="/dashboard" className="px-6 py-2.5 bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:scale-105 active:scale-95 rounded-full font-semibold transition-all shadow-md flex items-center group gap-2">

@@ -27,7 +27,7 @@ export default function LandingOverlay() {
                     </div>
 
                     <div className="mx-auto mt-8 flex justify-center">
-                        <BrandLogo href="/" priority imageClassName="text-4xl sm:text-6xl" />
+                        <BrandLogo href="/" imageClassName="text-4xl sm:text-6xl" />
                     </div>
                     <p className="mx-auto mt-6 max-w-2xl text-lg leading-8 text-slate-600 dark:text-slate-300 sm:text-xl">
                         NextGenius helps discover exceptional children early, verify their context, and connect them with meaningful support.
