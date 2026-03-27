@@ -5,6 +5,7 @@ import { useAuth } from '@/context/AuthContext';
 import api from '@/lib/api';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import BrandLogo from '@/components/BrandLogo';
 
 export default function RegisterPage() {
     const [email, setEmail] = useState('');
@@ -42,11 +43,12 @@ export default function RegisterPage() {
             <div className="mx-auto grid min-h-[calc(100vh-6rem)] max-w-6xl items-center gap-10 lg:grid-cols-[1.05fr_0.95fr]">
                 <div className="hidden lg:block">
                     <div className="max-w-xl">
+                        <BrandLogo imageClassName="max-w-[13rem]" />
                         <div className="glass inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium text-blue-700 dark:text-blue-300">
                             New Account
                         </div>
                         <h1 className="mt-6 text-5xl font-black tracking-tight text-slate-900 dark:text-white">
-                            Join the talent infrastructure.
+                            Join NextGenius.
                         </h1>
                         <p className="mt-5 text-lg leading-8 text-slate-600 dark:text-slate-300">
                             Create a sponsor, NGO, volunteer, or guardian account and access the same workflows already wired into the platform.
@@ -69,7 +71,7 @@ export default function RegisterPage() {
                             Create Account
                         </p>
                         <h2 className="mt-4 text-3xl font-extrabold text-slate-900 dark:text-white">
-                            Join the network
+                            Join NextGenius
                         </h2>
                         <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
                             Registration still uses the same backend contract and redirects into the dashboard.

@@ -7,7 +7,7 @@ export class AppService {
   constructor(private prisma: PrismaService) { }
 
   getHello(): string {
-    return 'Welcome to the Talent Infrastructure Network API';
+    return 'Welcome to the NextGenius API';
   }
 
   async getShowcaseData() {

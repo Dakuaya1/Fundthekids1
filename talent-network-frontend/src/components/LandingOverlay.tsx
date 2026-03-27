@@ -3,6 +3,7 @@
 import { Sparkles } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
+import BrandLogo from '@/components/BrandLogo';
 
 export default function LandingOverlay() {
     const [isOpen, setIsOpen] = useState(true);
@@ -25,11 +26,11 @@ export default function LandingOverlay() {
                         Agentic AI
                     </div>
 
-                    <h1 className="mt-8 text-4xl font-black tracking-tight text-slate-950 dark:text-white sm:text-6xl">
-                        Talent Network AI
-                    </h1>
+                    <div className="mx-auto mt-8 max-w-[26rem]">
+                        <BrandLogo href="/" priority imageClassName="mx-auto" />
+                    </div>
                     <p className="mx-auto mt-6 max-w-2xl text-lg leading-8 text-slate-600 dark:text-slate-300 sm:text-xl">
-                        An Agentic AI platform that analyzes, monitors, and optimizes real-world impact systems.
+                        NextGenius helps discover exceptional children early, verify their context, and connect them with meaningful support.
                     </p>
                     <p className="mt-5 text-sm font-medium tracking-[0.18em] text-slate-500 dark:text-slate-400">
                         Multi-agent orchestration • Real-time insights • Autonomous intelligence

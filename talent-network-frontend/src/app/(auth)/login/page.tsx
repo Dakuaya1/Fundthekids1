@@ -5,6 +5,7 @@ import { useAuth } from '@/context/AuthContext';
 import api from '@/lib/api';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import BrandLogo from '@/components/BrandLogo';
 
 export default function LoginPage() {
     const [email, setEmail] = useState('');
@@ -42,11 +43,12 @@ export default function LoginPage() {
             <div className="mx-auto grid min-h-[calc(100vh-6rem)] max-w-6xl items-center gap-10 lg:grid-cols-[1.05fr_0.95fr]">
                 <div className="hidden lg:block">
                     <div className="max-w-xl">
+                        <BrandLogo imageClassName="max-w-[13rem]" />
                         <div className="glass inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium text-blue-700 dark:text-blue-300">
                             Platform Access
                         </div>
                         <h1 className="mt-6 text-5xl font-black tracking-tight text-slate-900 dark:text-white">
-                            Step back into the network.
+                            Step back into NextGenius.
                         </h1>
                         <p className="mt-5 text-lg leading-8 text-slate-600 dark:text-slate-300">
                             Review sponsor activity, manage NGO workflows, and track impact through the same dashboard without changing how the app behaves.
@@ -72,7 +74,7 @@ export default function LoginPage() {
                             Sign in to your dashboard
                         </h2>
                         <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
-                            Use your account credentials or the seeded demo sponsor shortcut.
+                            Use your NextGenius account credentials or the seeded demo sponsor shortcut.
                         </p>
                     </div>
                 <form className="mt-8 space-y-6" onSubmit={handleSubmit}>

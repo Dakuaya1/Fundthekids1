@@ -3,11 +3,12 @@
 import { useAuth } from '@/context/AuthContext';
 import Link from 'next/link';
 import { motion, Variants } from 'framer-motion';
-import { ArrowRight, School, Heart, ShieldCheck, Globe, Star, Users, Loader2, MapPin, Award } from 'lucide-react';
+import { ArrowRight, School, Heart, ShieldCheck, Star, Users, Loader2, MapPin, Award } from 'lucide-react';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import api from '@/lib/api';
 import AboutCreator from '@/components/AboutCreator';
+import BrandLogo from '@/components/BrandLogo';
 
 interface Child {
   id: string;
@@ -92,14 +93,7 @@ export default function Home() {
         className="absolute top-0 w-full z-50 px-6 py-6"
       >
         <div className="max-w-7xl mx-auto flex justify-between items-center glass px-6 py-4 rounded-3xl">
-          <div className="flex items-center space-x-3">
-            <div className="bg-gradient-to-br from-blue-500 to-indigo-600 p-2.5 rounded-xl shadow-lg shadow-blue-500/30">
-              <Globe className="w-6 h-6 text-white" />
-            </div>
-            <span className="text-2xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-slate-900 to-slate-700 dark:from-white dark:to-slate-300">
-              Talent Network
-            </span>
-          </div>
+          <BrandLogo priority imageClassName="max-w-[13rem] sm:max-w-[15rem]" />
           <div className="hidden sm:flex items-center space-x-6">
             {isAuthenticated ? (
               <Link href="/dashboard" className="px-6 py-2.5 bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:scale-105 active:scale-95 rounded-full font-semibold transition-all shadow-md flex items-center group gap-2">
@@ -132,7 +126,7 @@ export default function Home() {
             </motion.h1>
 
             <motion.p variants={itemVariants} className="mt-8 max-w-3xl text-xl leading-9 text-slate-600 dark:text-slate-300 md:text-2xl">
-              Talent Network identifies extraordinary kids through verified NGOs, surfaces their strongest gifts, and helps sponsors fund the children with the highest upside and the greatest urgency.
+              NextGenius identifies extraordinary children through verified NGOs, surfaces their strongest gifts, and helps sponsors fund the children with the highest upside and the greatest urgency.
             </motion.p>
 
             <motion.div variants={itemVariants} className="mt-10 flex flex-col gap-4 sm:flex-row">
@@ -446,9 +440,12 @@ export default function Home() {
 
       {/* Footer */}
       <footer className="border-t border-slate-200 dark:border-slate-800 py-12 text-center relative z-10 glass">
-        <p suppressHydrationWarning className="text-slate-500 font-medium flex items-center justify-center gap-2">
-          <Globe className="w-5 h-5 text-blue-500" /> Talent Infrastructure Network &copy; {new Date().getFullYear()}
-        </p>
+        <div className="mx-auto flex max-w-7xl flex-col items-center gap-4">
+          <BrandLogo href="/" imageClassName="max-w-[12rem]" />
+          <p suppressHydrationWarning className="text-slate-500 font-medium">
+            NextGenius &copy; {new Date().getFullYear()}
+          </p>
+        </div>
       </footer>
     </div>
   );

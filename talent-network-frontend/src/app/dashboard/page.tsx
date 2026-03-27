@@ -13,6 +13,7 @@ import ImpactWidget from '@/components/dashboard/ImpactWidget';
 import AdminDashboard from '@/components/dashboard/AdminDashboard';
 import VolunteerDashboard from '@/components/dashboard/VolunteerDashboard';
 import AIAssistant from '@/components/AIAssistant';
+import BrandLogo from '@/components/BrandLogo';
 
 export default function DashboardPage() {
     const { user, isAuthenticated, isLoading: authLoading, logout } = useAuth();
@@ -82,9 +83,7 @@ export default function DashboardPage() {
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex justify-between h-16">
                         <div className="flex items-center">
-                            <span className="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400">
-                                Talent Network
-                            </span>
+                            <BrandLogo imageClassName="max-w-[12rem]" />
                         </div>
                         <div className="flex items-center space-x-5">
                             <span className="text-sm font-medium text-slate-600 dark:text-slate-300 hidden sm:block">

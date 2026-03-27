@@ -31,9 +31,9 @@ async function bootstrap() {
   );
 
   const config = new DocumentBuilder()
-    .setTitle('Talent Infrastructure Network API')
+    .setTitle('NextGenius API')
     .setDescription(
-      'The API documentation for the scalable sponsorship and talent growth platform.',
+      'API documentation for the NextGenius sponsorship and talent growth platform.',
     )
     .setVersion('1.0')
     .addBearerAuth()

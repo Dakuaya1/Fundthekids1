@@ -1,0 +1,11 @@
+<svg width="840" height="220" viewBox="0 0 840 220" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="840" height="220" rx="24" fill="transparent"/>
+  <g transform="translate(20 16)">
+    <path d="M110 168C122 145 137 130 155 120C174 109 190 91 198 68C201 60 205 56 211 56C220 56 227 63 227 72C227 78 224 83 219 87L227 126C213 143 199 156 183 166C164 178 141 186 110 188V168Z" fill="#172B5A"/>
+    <circle cx="126" cy="104" r="28" fill="#172B5A"/>
+    <path d="M85 173C92 145 104 123 120 111L140 126C126 139 117 155 112 176L85 173Z" fill="#172B5A"/>
+    <path d="M133 81C149 75 162 62 168 44L202 52C193 74 177 91 156 101L133 81Z" fill="#172B5A"/>
+    <path d="M220 18L225.393 34.607H242L228.553 44.786L233.946 61.393L220 51.214L206.054 61.393L211.447 44.786L198 34.607H214.607L220 18Z" fill="#F5B332"/>
+  </g>
+  <text x="280" y="134" fill="#172B5A" font-family="Arial, Helvetica, sans-serif" font-size="86" font-weight="500">NextGenius</text>
+</svg>

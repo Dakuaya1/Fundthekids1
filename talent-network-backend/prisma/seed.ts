@@ -200,7 +200,7 @@ async function ensureReport({
 }
 
 async function main() {
-  console.log('Seeding demo data for Talent Network AI...');
+  console.log('Seeding demo data for NextGenius...');
 
   const hashedPassword = await bcrypt.hash(DEMO_PASSWORD, 10);
 

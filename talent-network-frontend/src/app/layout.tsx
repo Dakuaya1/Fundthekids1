@@ -16,8 +16,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Talent Infrastructure Network",
-  description: "A scalable sponsorship and talent growth platform.",
+  title: "NextGenius",
+  description: "A platform for discovering, verifying, and supporting exceptional children.",
 };
 
 export default function RootLayout({
