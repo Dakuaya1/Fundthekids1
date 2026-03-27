@@ -14,13 +14,16 @@ export default function BrandLogo({
 }: BrandLogoProps) {
   const content = (
     <div className={`flex items-center ${className}`.trim()}>
-      <Image
-        src="/nextgenius-logo-exact.svg"
-        alt="NextGenius"
-        width={1024}
-        height={1024}
-        className={`h-auto w-full ${imageClassName}`.trim()}
-      />
+      <div className={`relative w-[10rem] overflow-hidden ${imageClassName}`.trim()}>
+        <div className="relative aspect-[4.2/1] w-full overflow-hidden">
+          <Image
+            src="/nextgenius-logo-exact.svg"
+            alt="NextGenius"
+            fill
+            className="object-contain scale-[2.05] -translate-x-[11%] translate-y-[2%]"
+          />
+        </div>
+      </div>
     </div>
   );
 

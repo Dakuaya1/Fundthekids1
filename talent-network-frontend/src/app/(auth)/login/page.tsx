@@ -43,7 +43,7 @@ export default function LoginPage() {
             <div className="mx-auto grid min-h-[calc(100vh-6rem)] max-w-6xl items-center gap-10 lg:grid-cols-[1.05fr_0.95fr]">
                 <div className="hidden lg:block">
                     <div className="max-w-xl">
-                        <BrandLogo imageClassName="text-2xl" />
+                        <BrandLogo imageClassName="w-[10.5rem]" />
                         <div className="glass inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium text-blue-700 dark:text-blue-300">
                             Platform Access
                         </div>

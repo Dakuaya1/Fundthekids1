@@ -83,7 +83,7 @@ export default function DashboardPage() {
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex justify-between h-16">
                         <div className="flex items-center">
-                            <BrandLogo imageClassName="text-2xl" />
+                            <BrandLogo imageClassName="w-[10.5rem]" />
                         </div>
                         <div className="flex items-center space-x-5">
                             <span className="text-sm font-medium text-slate-600 dark:text-slate-300 hidden sm:block">
