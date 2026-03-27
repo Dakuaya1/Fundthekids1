@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import Link from 'next/link';
 
 type BrandLogoProps = {
@@ -13,12 +14,13 @@ export default function BrandLogo({
 }: BrandLogoProps) {
   const content = (
     <div className={`flex items-center ${className}`.trim()}>
-      <span
-        className={`inline-flex items-center text-3xl font-extrabold tracking-tight text-slate-950 dark:text-white ${imageClassName}`.trim()}
-      >
-        <span className="mr-2 text-amber-400">★</span>
-        <span>NextGenius</span>
-      </span>
+      <Image
+        src="/nextgenius-logo-exact.png"
+        alt="NextGenius"
+        width={1024}
+        height={1024}
+        className={`h-auto w-full ${imageClassName}`.trim()}
+      />
     </div>
   );
 
