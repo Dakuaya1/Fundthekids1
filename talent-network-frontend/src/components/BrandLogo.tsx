@@ -15,7 +15,7 @@ export default function BrandLogo({
   const content = (
     <div className={`flex items-center ${className}`.trim()}>
       <Image
-        src="/nextgenius-logo-exact.png"
+        src="/nextgenius-logo-exact.svg"
         alt="NextGenius"
         width={1024}
         height={1024}
