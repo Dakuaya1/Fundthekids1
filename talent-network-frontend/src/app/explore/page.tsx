@@ -21,6 +21,14 @@ interface Child {
     ngo: { name: string; region: string };
 }
 
+function resolvePleaVideoUrl(child: Child) {
+    if (child.name === 'Aisha Mwangi') {
+        return '/aisha-mwangi-math-plea.mp4';
+    }
+
+    return child.pleaVideoUrl;
+}
+
 export default function ExplorePage() {
     const { isAuthenticated } = useAuth();
     const router = useRouter();
@@ -121,8 +129,10 @@ function KidCard({ child, isAuthenticated, router }: { child: Child, isAuthentic
 
     // Pre-process media: combine video(s) and images if they exist
     const allMedia: { type: 'video' | 'image', url: string }[] = [];
-    if (child.pleaVideoUrl) {
-        allMedia.push({ type: 'video', url: child.pleaVideoUrl });
+    const pleaVideoUrl = resolvePleaVideoUrl(child);
+
+    if (pleaVideoUrl) {
+        allMedia.push({ type: 'video', url: pleaVideoUrl });
     }
     if (child.mediaUrls && child.mediaUrls.length > 0) {
         child.mediaUrls.forEach(url => allMedia.push({ type: 'image', url }));

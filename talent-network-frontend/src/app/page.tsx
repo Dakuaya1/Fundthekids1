@@ -93,7 +93,7 @@ export default function Home() {
         className="absolute top-0 w-full z-50 px-6 py-6"
       >
         <div className="max-w-7xl mx-auto flex justify-between items-center glass px-6 py-4 rounded-3xl">
-          <BrandLogo priority imageClassName="max-w-[13rem] sm:max-w-[15rem]" />
+          <BrandLogo priority imageClassName="text-2xl sm:text-3xl" />
           <div className="hidden sm:flex items-center space-x-6">
             {isAuthenticated ? (
               <Link href="/dashboard" className="px-6 py-2.5 bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:scale-105 active:scale-95 rounded-full font-semibold transition-all shadow-md flex items-center group gap-2">
@@ -171,40 +171,50 @@ export default function Home() {
           </div>
 
           <motion.div variants={itemVariants} className="relative">
-            <div className="glass-card panel-outline relative overflow-hidden rounded-[2.5rem] p-6 shadow-2xl shadow-blue-500/10">
-              <div className="absolute inset-x-0 top-0 h-40 bg-gradient-to-br from-blue-500/20 via-cyan-400/10 to-transparent" />
-              <div className="relative z-10">
-                <div className="flex items-center justify-between rounded-[1.6rem] border border-white/20 bg-slate-950 px-5 py-4 text-white shadow-xl">
-                  <div>
-                    <p className="text-xs font-bold uppercase tracking-[0.22em] text-blue-200">Priority Lens</p>
-                    <p className="mt-2 text-2xl font-black">High-potential. High-need.</p>
-                  </div>
-                  <div className="rounded-2xl bg-white/10 p-3">
-                    <Heart className="h-7 w-7 text-cyan-300" />
-                  </div>
-                </div>
+            <div className="glass-card panel-outline relative overflow-hidden rounded-[2.5rem] shadow-2xl shadow-blue-500/10">
+              <div className="relative aspect-[4/5] min-h-[32rem] w-full bg-slate-950">
+                <video
+                  className="absolute inset-0 h-full w-full object-cover"
+                  autoPlay
+                  muted
+                  loop
+                  playsInline
+                  preload="auto"
+                >
+                  <source src="/hero-video.mp4" type="video/mp4" />
+                </video>
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/30 to-slate-950/10" />
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(56,189,248,0.18),transparent_32%),radial-gradient(circle_at_bottom,rgba(99,102,241,0.24),transparent_36%)]" />
 
-                <div className="mt-5 space-y-4">
-                  {[
-                    'NGOs nominate children showing rare academic, artistic, athletic, or technical ability.',
-                    'Volunteer verification strengthens trust before sponsors commit meaningful support.',
-                    'The platform spotlights the children whose potential is highest and whose resources are thinnest.',
-                  ].map((point) => (
-                    <div key={point} className="flex gap-3 rounded-[1.4rem] border border-slate-200/60 bg-white/70 p-4 dark:border-slate-700/60 dark:bg-slate-900/70">
-                      <div className="mt-1 h-2.5 w-2.5 flex-shrink-0 rounded-full bg-gradient-to-r from-blue-500 to-cyan-400" />
-                      <p className="text-sm leading-7 text-slate-700 dark:text-slate-200">{point}</p>
+                <div className="relative z-10 flex h-full flex-col justify-between p-6 sm:p-8">
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="rounded-[1.4rem] border border-white/15 bg-white/10 px-5 py-4 text-white backdrop-blur-md">
+                      <p className="text-xs font-bold uppercase tracking-[0.22em] text-cyan-200">NextGenius Lens</p>
+                      <p className="mt-2 text-2xl font-black">High-potential. High-need.</p>
                     </div>
-                  ))}
-                </div>
-
-                <div className="mt-5 grid gap-4 sm:grid-cols-2">
-                  <div className="rounded-[1.6rem] bg-gradient-to-br from-blue-600 to-indigo-600 p-5 text-white shadow-lg shadow-blue-500/20">
-                    <p className="text-xs font-bold uppercase tracking-[0.22em] text-blue-100">Why this matters</p>
-                    <p className="mt-3 text-lg font-semibold leading-8">Prodigy is often found in places where support is missing. That gap is the problem this platform is built to close.</p>
+                    <div className="rounded-2xl border border-white/15 bg-white/10 p-3 text-white backdrop-blur-md">
+                      <Heart className="h-7 w-7 text-cyan-300" />
+                    </div>
                   </div>
-                  <div className="rounded-[1.6rem] border border-slate-200/70 bg-white/80 p-5 dark:border-slate-700/60 dark:bg-slate-900/70">
-                    <p className="text-xs font-bold uppercase tracking-[0.22em] text-slate-500 dark:text-slate-400">Decision support</p>
-                    <p className="mt-3 text-lg font-semibold leading-8 text-slate-900 dark:text-white">Sponsors don&apos;t just donate blindly. They back visible talent with verified context.</p>
+
+                  <div className="space-y-4">
+                    <div className="rounded-[1.6rem] border border-white/15 bg-white/10 p-5 text-white backdrop-blur-md">
+                      <p className="text-xs font-bold uppercase tracking-[0.22em] text-cyan-200">Why this matters</p>
+                      <p className="mt-3 text-lg font-semibold leading-8">
+                        Exceptional children should not lose their future because opportunity arrived too late.
+                      </p>
+                    </div>
+
+                    <div className="grid gap-3 sm:grid-cols-2">
+                      {[
+                        'Verified by NGOs and field volunteers before support begins.',
+                        'Built to connect visible talent with timely sponsorship.',
+                      ].map((point) => (
+                        <div key={point} className="rounded-[1.4rem] border border-white/12 bg-slate-950/45 p-4 text-sm leading-7 text-slate-100 backdrop-blur-md">
+                          {point}
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -441,7 +451,7 @@ export default function Home() {
       {/* Footer */}
       <footer className="border-t border-slate-200 dark:border-slate-800 py-12 text-center relative z-10 glass">
         <div className="mx-auto flex max-w-7xl flex-col items-center gap-4">
-          <BrandLogo href="/" imageClassName="max-w-[12rem]" />
+          <BrandLogo href="/" imageClassName="text-2xl" />
           <p suppressHydrationWarning className="text-slate-500 font-medium">
             NextGenius &copy; {new Date().getFullYear()}
           </p>

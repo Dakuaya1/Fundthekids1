@@ -76,7 +76,7 @@ const demoChildren = [
     talentCategory: 'Mathematics',
     city: 'Nairobi',
     location: 'South B',
-    pleaVideoUrl: 'https://example.com/aisha-plea.mp4',
+    pleaVideoUrl: '/aisha-mwangi-math-plea.mp4',
     mediaUrls: ['https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&w=900&q=80'],
     status: ChildStatus.VERIFIED,
   },
