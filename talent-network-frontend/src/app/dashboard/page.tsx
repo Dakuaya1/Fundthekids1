@@ -12,6 +12,7 @@ import SponsorDashboard from '@/components/dashboard/SponsorDashboard';
 import ImpactWidget from '@/components/dashboard/ImpactWidget';
 import AdminDashboard from '@/components/dashboard/AdminDashboard';
 import VolunteerDashboard from '@/components/dashboard/VolunteerDashboard';
+import GuardianDashboard from '@/components/dashboard/GuardianDashboard';
 import AIAssistant from '@/components/AIAssistant';
 import BrandLogo from '@/components/BrandLogo';
 
@@ -25,6 +26,8 @@ export default function DashboardPage() {
         ? 'Review new child submissions, verify profiles, and maintain sponsor-ready updates.'
         : user?.role === 'VOLUNTEER'
             ? 'Work through your regional review queue and validate field reports.'
+            : user?.role === 'GUARDIAN'
+                ? 'Turn funded plans into real delivery by arranging school, lodging, and service execution.'
             : user?.role === 'SPONSOR'
                 ? 'Explore verified children and sponsor the ones with the highest potential.'
                 : 'Access role-based workflows across the network.';
@@ -138,6 +141,11 @@ export default function DashboardPage() {
                                     Review Queue Active
                                 </span>
                             )}
+                            {user?.role === 'GUARDIAN' && (
+                                <span className="rounded-full bg-white/15 px-5 py-3 text-sm font-semibold text-white">
+                                    Delivery Cases Active
+                                </span>
+                            )}
                             {user?.role === 'NGO' && (
                                 <span className="rounded-full bg-white/15 px-5 py-3 text-sm font-semibold text-white">
                                     Verify Children
@@ -159,6 +167,7 @@ export default function DashboardPage() {
                             {user?.role === 'NGO' && <NgoDashboard />}
                             {user?.role === 'SPONSOR' && <SponsorDashboard />}
                             {user?.role === 'VOLUNTEER' && <VolunteerDashboard />}
+                            {user?.role === 'GUARDIAN' && <GuardianDashboard />}
                         </div>
 
                         {/* Sidebar Area */}

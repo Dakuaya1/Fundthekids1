@@ -13,6 +13,7 @@ import { AiEngineModule } from './modules/ai-engine/ai-engine.module';
 import { PaymentEngineModule } from './modules/payment-engine/payment-engine.module';
 import { AdminModule } from './modules/admin/admin.module';
 import { AiAgentsModule } from './ai-agents/ai.module';
+import { GuardianModule } from './modules/guardian/guardian.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { AiAgentsModule } from './ai-agents/ai.module';
     AiEngineModule,
     PaymentEngineModule,
     AdminModule,
+    GuardianModule,
     AiAgentsModule,
   ],
   controllers: [AppController],

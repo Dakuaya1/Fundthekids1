@@ -10,11 +10,26 @@ interface Child {
     talentCategory: string;
     isActive: boolean;
     status: 'PENDING' | 'VERIFIED';
+    guardian?: {
+        fullName: string;
+        region: string;
+        organizationName?: string | null;
+    } | null;
+}
+
+interface AvailableGuardian {
+    user: { id: string; email: string };
+    fullName: string;
+    region: string;
+    organizationName?: string | null;
+    specialties: string[];
+    _count: { assignedChildren: number };
 }
 
 export default function NgoDashboard() {
     const [children, setChildren] = useState<Child[]>([]);
     const [loading, setLoading] = useState(true);
+    const [guardians, setGuardians] = useState<AvailableGuardian[]>([]);
 
     // Form State
     const [showForm, setShowForm] = useState(false);
@@ -34,9 +49,12 @@ export default function NgoDashboard() {
     const [reportSubmitting, setReportSubmitting] = useState(false);
     const [reportMsg, setReportMsg] = useState('');
     const [verifyingChildId, setVerifyingChildId] = useState<string | null>(null);
+    const [assigningChildId, setAssigningChildId] = useState<string | null>(null);
+    const [guardianSelections, setGuardianSelections] = useState<Record<string, string>>({});
 
     useEffect(() => {
         fetchChildren();
+        fetchGuardians();
     }, []);
 
     const fetchChildren = async () => {
@@ -48,6 +66,15 @@ export default function NgoDashboard() {
             console.error('Failed to fetch children', err);
         } finally {
             setLoading(false);
+        }
+    };
+
+    const fetchGuardians = async () => {
+        try {
+            const res = await api.get('/guardian/available');
+            setGuardians(res.data);
+        } catch (err) {
+            console.error('Failed to fetch guardians', err);
         }
     };
 
@@ -124,6 +151,21 @@ export default function NgoDashboard() {
             console.error('Failed to verify child', err);
         } finally {
             setVerifyingChildId(null);
+        }
+    };
+
+    const handleAssignGuardian = async (childId: string) => {
+        const guardianUserId = guardianSelections[childId];
+        if (!guardianUserId) return;
+
+        try {
+            setAssigningChildId(childId);
+            await api.post('/guardian/assign-child', { childId, guardianUserId });
+            await fetchChildren();
+        } catch (err) {
+            console.error('Failed to assign guardian', err);
+        } finally {
+            setAssigningChildId(null);
         }
     };
 
@@ -319,10 +361,39 @@ export default function NgoDashboard() {
                                     </div>
                                     <div className="mt-4 sm:flex sm:justify-between sm:items-center">
                                         <div className="sm:flex">
-                                            <p className="flex items-center text-sm text-slate-600 dark:text-slate-400 font-light gap-2">
-                                                <Calendar className="w-4 h-4 text-slate-400" />
-                                                Born: <time suppressHydrationWarning dateTime={child.dob} className="font-medium text-slate-700 dark:text-slate-300">{new Date(child.dob).toLocaleDateString()}</time>
-                                            </p>
+                                            <div className="space-y-2">
+                                                <p className="flex items-center text-sm text-slate-600 dark:text-slate-400 font-light gap-2">
+                                                    <Calendar className="w-4 h-4 text-slate-400" />
+                                                    Born: <time suppressHydrationWarning dateTime={child.dob} className="font-medium text-slate-700 dark:text-slate-300">{new Date(child.dob).toLocaleDateString()}</time>
+                                                </p>
+                                                {child.guardian ? (
+                                                    <p className="text-sm text-slate-600 dark:text-slate-400">
+                                                        Assigned guardian: <span className="font-semibold text-slate-800 dark:text-slate-200">{child.guardian.fullName}</span>
+                                                    </p>
+                                                ) : child.status === 'VERIFIED' ? (
+                                                    <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+                                                        <select
+                                                            value={guardianSelections[child.id] || ''}
+                                                            onChange={(e) => setGuardianSelections(prev => ({ ...prev, [child.id]: e.target.value }))}
+                                                            className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
+                                                        >
+                                                            <option value="">Assign a guardian</option>
+                                                            {guardians.map((guardian) => (
+                                                                <option key={guardian.user.id} value={guardian.user.id}>
+                                                                    {guardian.fullName} • {guardian.region} • {guardian._count.assignedChildren} cases
+                                                                </option>
+                                                            ))}
+                                                        </select>
+                                                        <button
+                                                            onClick={() => handleAssignGuardian(child.id)}
+                                                            disabled={!guardianSelections[child.id] || assigningChildId === child.id}
+                                                            className="inline-flex items-center justify-center rounded-xl bg-amber-500 px-4 py-2 text-sm font-bold text-white transition hover:bg-amber-600 disabled:opacity-50"
+                                                        >
+                                                            {assigningChildId === child.id ? 'Assigning...' : 'Assign Guardian'}
+                                                        </button>
+                                                    </div>
+                                                ) : null}
+                                            </div>
                                         </div>
                                         <div className="mt-4 flex items-center text-sm sm:mt-0">
                                             {child.status === 'PENDING' && (

@@ -47,6 +47,17 @@ const demoUsers = {
       verifiedStatus: true,
     },
   },
+  guardian: {
+    email: 'guardian@demo.com',
+    role: Role.GUARDIAN,
+    guardian: {
+      fullName: 'Amina Wanjiku',
+      region: 'Nairobi',
+      organizationName: 'NextGenius Care Network',
+      specialties: ['School Placement', 'Lodging', 'Student Support'],
+      isAvailable: true,
+    },
+  },
 };
 
 const demoChildren = [
@@ -246,6 +257,20 @@ async function main() {
     },
   });
 
+  const guardianUser = await upsertUser(
+    demoUsers.guardian.email,
+    demoUsers.guardian.role,
+    hashedPassword,
+  );
+  await prisma.guardian.upsert({
+    where: { userId: guardianUser.id },
+    update: demoUsers.guardian.guardian,
+    create: {
+      userId: guardianUser.id,
+      ...demoUsers.guardian.guardian,
+    },
+  });
+
   const children = [];
   for (const child of demoChildren) {
     const record = await ensureChild(ngoProfile.id, child);
@@ -327,9 +352,41 @@ async function main() {
         },
       });
     }
+
+    await prisma.child.update({
+      where: { id: children[0].id },
+      data: { guardianId: guardianUser.id },
+    });
+
+    await prisma.guardianService.upsert({
+      where: { childId: children[0].id },
+      update: {
+        guardianUserId: guardianUser.id,
+        schoolStatus: 'IN_PROGRESS',
+        lodgingStatus: 'READY_TO_START',
+        activityStatus: 'NOT_STARTED',
+        schoolName: 'Kilimani Talent Academy',
+        lodgingDetails: 'Host family screening is underway near the school.',
+        activityDetails: 'Robotics club enrollment starts after school intake.',
+        notes: 'Funding is live, so delivery has moved into implementation.',
+      },
+      create: {
+        childId: children[0].id,
+        guardianUserId: guardianUser.id,
+        schoolStatus: 'IN_PROGRESS',
+        lodgingStatus: 'READY_TO_START',
+        activityStatus: 'NOT_STARTED',
+        schoolName: 'Kilimani Talent Academy',
+        lodgingDetails: 'Host family screening is underway near the school.',
+        activityDetails: 'Robotics club enrollment starts after school intake.',
+        notes: 'Funding is live, so delivery has moved into implementation.',
+      },
+    });
   }
 
-  console.log('Demo users ready: sponsor@demo.com, volunteer@demo.com, ngo@demo.com');
+  console.log(
+    'Demo users ready: sponsor@demo.com, volunteer@demo.com, ngo@demo.com, guardian@demo.com',
+  );
   console.log('Demo password: password123');
   console.log('Demo child inventory: 3 VERIFIED, 2 PENDING');
   console.log('Seeding complete');

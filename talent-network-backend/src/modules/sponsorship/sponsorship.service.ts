@@ -5,6 +5,7 @@ import { CreatePledgeDto } from './dto/create-pledge.dto';
 import { GamificationService } from '../gamification/gamification.service';
 import { PaymentEngineService } from '../payment-engine/payment-engine.service';
 import { PlanCategory, PlanStatus, PlanType } from '@prisma/client';
+import { GuardianService } from '../guardian/guardian.service';
 
 @Injectable()
 export class SponsorshipService {
@@ -12,6 +13,7 @@ export class SponsorshipService {
     private prisma: PrismaService,
     private gamificationService: GamificationService,
     private paymentEngineService: PaymentEngineService,
+    private guardianService: GuardianService,
   ) {}
 
   async createPlan(userId: string, createPlanDto: CreatePlanDto) {
@@ -76,7 +78,7 @@ export class SponsorshipService {
       throw new NotFoundException('Child not found');
     }
 
-    await this.prisma.sponsorshipPlan.create({
+    const createdPlan = await this.prisma.sponsorshipPlan.create({
       data: {
         childId: createPledgeDto.childId,
         sponsorId: sponsor.id,
@@ -91,6 +93,20 @@ export class SponsorshipService {
       userId,
       Math.floor(createPledgeDto.amount),
       `Created Demo Pledge for ${createPledgeDto.amount} USD`,
+    );
+
+    await this.prisma.payment.create({
+      data: {
+        sponsorId: sponsor.id,
+        planId: createdPlan.id,
+        amount: createPledgeDto.amount,
+        currency: 'USD',
+        status: 'COMPLETED',
+      },
+    });
+
+    await this.guardianService.autoAssignGuardianForFundedChild(
+      createPledgeDto.childId,
     );
 
     return { message: 'Pledge successful' };

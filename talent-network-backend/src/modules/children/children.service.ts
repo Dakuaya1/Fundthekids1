@@ -38,7 +38,7 @@ export class ChildrenService {
   ) {
     const uploader = await this.prisma.user.findUnique({
       where: { id: uploaderId },
-      include: { ngo: true },
+      include: { ngo: true, guardian: true },
     });
     if (!uploader || (!uploader.ngo && uploader.role !== 'GUARDIAN')) {
       throw new NotFoundException('Authorized profile not found');
@@ -48,6 +48,10 @@ export class ChildrenService {
       where: { id: childId },
     });
     if (!child) throw new NotFoundException('Child not found');
+
+    if (uploader.role === 'GUARDIAN' && child.guardianId !== uploaderId) {
+      throw new NotFoundException('Guardian is not assigned to this child');
+    }
 
     // Fetch last 5 reports for context
     const recentReports = await this.prisma.progressReport.findMany({

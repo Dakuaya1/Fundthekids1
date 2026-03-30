@@ -31,6 +31,15 @@ export class UsersService {
         await tx.volunteer.create({
           data: { userId: user.id, assignedRegion: 'Global' },
         });
+      } else if (user.role === Role.GUARDIAN) {
+        await tx.guardian.create({
+          data: {
+            userId: user.id,
+            fullName: user.email.split('@')[0],
+            region: 'Global',
+            specialties: ['Education', 'Lodging', 'Student Support'],
+          },
+        });
       }
 
       return user;
@@ -39,14 +48,41 @@ export class UsersService {
 
   async findAll() {
     return this.prisma.user.findMany({
-      select: { id: true, email: true, role: true, createdAt: true },
+      select: {
+        id: true,
+        email: true,
+        role: true,
+        createdAt: true,
+        guardian: {
+          select: {
+            fullName: true,
+            region: true,
+            organizationName: true,
+            isAvailable: true,
+          },
+        },
+      },
     });
   }
 
   async findOne(id: string) {
     return this.prisma.user.findUnique({
       where: { id },
-      select: { id: true, email: true, role: true, createdAt: true },
+      select: {
+        id: true,
+        email: true,
+        role: true,
+        createdAt: true,
+        guardian: {
+          select: {
+            fullName: true,
+            region: true,
+            organizationName: true,
+            specialties: true,
+            isAvailable: true,
+          },
+        },
+      },
     });
   }
 

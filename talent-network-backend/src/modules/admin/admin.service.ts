@@ -52,6 +52,14 @@ export class AdminService {
         // Do not fetch passwordHash
         ngo: { select: { verifiedStatus: true, name: true, region: true } },
         sponsor: { select: { impactScore: true, leaderboardRank: true } },
+        guardian: {
+          select: {
+            fullName: true,
+            region: true,
+            organizationName: true,
+            isAvailable: true,
+          },
+        },
       },
     });
 

@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import Stripe from 'stripe';
 import { PrismaService } from '../../config/prisma.service';
+import { GuardianService } from '../guardian/guardian.service';
 
 export interface IPaymentWrapper {
   createCheckoutSession(
@@ -18,7 +19,10 @@ export class PaymentEngineService implements IPaymentWrapper {
   private stripe: Stripe;
   private readonly logger = new Logger(PaymentEngineService.name);
 
-  constructor(private prisma: PrismaService) {
+  constructor(
+    private prisma: PrismaService,
+    private guardianService: GuardianService,
+  ) {
     // Fallback to a mock key to prevent crashing if user hasn't supplied one in .env yet
     this.stripe = new Stripe(
       process.env.STRIPE_SECRET_KEY || 'sk_test_mocked',
@@ -132,6 +136,17 @@ export class PaymentEngineService implements IPaymentWrapper {
           where: { id: metadata.planId },
           data: { status: 'ACTIVE' },
         });
+
+        const plan = await this.prisma.sponsorshipPlan.findUnique({
+          where: { id: metadata.planId },
+          select: { childId: true },
+        });
+
+        if (plan) {
+          await this.guardianService.autoAssignGuardianForFundedChild(
+            plan.childId,
+          );
+        }
 
         this.logger.log(
           `Payment confirmed and plan ${metadata.planId} activated for sponsor ${metadata.sponsorId}`,

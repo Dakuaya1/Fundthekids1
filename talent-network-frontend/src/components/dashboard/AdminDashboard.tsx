@@ -18,6 +18,7 @@ interface UserData {
     createdAt: string;
     ngo?: { verifiedStatus: string | boolean; name: string; region: string };
     sponsor?: { impactScore: number; leaderboardRank: number };
+    guardian?: { fullName: string; region: string; organizationName?: string | null; isAvailable: boolean };
 }
 
 export default function AdminDashboard() {
@@ -134,6 +135,7 @@ export default function AdminDashboard() {
                                             ${u.role === 'ADMIN' ? 'bg-purple-100 text-purple-800' :
                                                 u.role === 'NGO' ? 'bg-amber-100 text-amber-800' :
                                                     u.role === 'SPONSOR' ? 'bg-blue-100 text-blue-800' :
+                                                        u.role === 'GUARDIAN' ? 'bg-orange-100 text-orange-800' :
                                                         'bg-gray-100 text-gray-800'}`}>
                                             {u.role}
                                         </span>
@@ -154,6 +156,11 @@ export default function AdminDashboard() {
                                         )}
                                         {u.role === 'ADMIN' && (
                                             <span className="text-purple-600 font-medium">System Operator</span>
+                                        )}
+                                        {u.role === 'GUARDIAN' && u.guardian && (
+                                            <span>
+                                                {u.guardian.fullName} • {u.guardian.region} • {u.guardian.isAvailable ? 'Available' : 'Busy'}
+                                            </span>
                                         )}
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">

@@ -42,6 +42,16 @@ export class NgoService {
 
     return this.prisma.child.findMany({
       where: { ngoId: ngo.id },
+      include: {
+        guardian: {
+          select: {
+            fullName: true,
+            region: true,
+            organizationName: true,
+          },
+        },
+        serviceRecord: true,
+      },
       orderBy: [{ status: 'asc' }, { name: 'asc' }],
     });
   }

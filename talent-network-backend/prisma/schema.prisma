@@ -52,6 +52,14 @@ enum ChildStatus {
   VERIFIED
 }
 
+enum ServiceStatus {
+  NOT_STARTED
+  READY_TO_START
+  IN_PROGRESS
+  COMPLETED
+  BLOCKED
+}
+
 model User {
   id           String        @id @default(uuid())
   email        String        @unique
@@ -63,6 +71,7 @@ model User {
   sponsor      Sponsor?
   volunteer    Volunteer?
   ngo          NGO?
+  guardian     Guardian?
   
   userBadges   UserBadge[]
   activityLogs ActivityLog[]
@@ -100,6 +109,22 @@ model Sponsor {
   payments        Payment[]
 }
 
+model Guardian {
+  id               String            @id @default(uuid())
+  userId           String            @unique
+  user             User              @relation(fields: [userId], references: [id])
+  fullName         String
+  region           String
+  organizationName String?
+  specialties      String[]
+  isAvailable      Boolean           @default(true)
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+
+  assignedChildren Child[]           @relation("ChildGuardian")
+  services         GuardianService[]
+}
+
 model Child {
   id             String            @id @default(uuid())
   name           String
@@ -108,7 +133,8 @@ model Child {
   status         ChildStatus       @default(PENDING)
   ngoId          String
   ngo            NGO               @relation(fields: [ngoId], references: [id])
-  guardianId     String?           // Maps to a User ID (Guardian role)
+  guardianId     String?           // Maps to Guardian.userId
+  guardian       Guardian?         @relation("ChildGuardian", fields: [guardianId], references: [userId])
   isActive       Boolean           @default(true)
   city           String            @default("")
   location       String            @default("")
@@ -117,6 +143,26 @@ model Child {
   
   reports        ProgressReport[]
   plans          SponsorshipPlan[]
+  serviceRecord  GuardianService?
+}
+
+model GuardianService {
+  id              String        @id @default(uuid())
+  childId         String        @unique
+  child           Child         @relation(fields: [childId], references: [id])
+  guardianUserId  String
+  guardian        Guardian      @relation(fields: [guardianUserId], references: [userId])
+  schoolStatus    ServiceStatus @default(NOT_STARTED)
+  lodgingStatus   ServiceStatus @default(NOT_STARTED)
+  activityStatus  ServiceStatus @default(NOT_STARTED)
+  schoolName      String?
+  lodgingDetails  String?
+  activityDetails String?
+  notes           String?
+  startedAt       DateTime?
+  completedAt     DateTime?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
 }
 
 model SponsorshipPlan {
