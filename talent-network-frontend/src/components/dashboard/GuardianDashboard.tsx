@@ -1,352 +1,217 @@
-import { useEffect, useState, type ComponentType } from 'react';
-import api from '@/lib/api';
-import { motion } from 'framer-motion';
-import {
-  Briefcase,
-  GraduationCap,
-  Home,
-  Loader2,
-  Sparkles,
-  Target,
-} from 'lucide-react';
+'use client';
 
-type ServiceStatus =
-  | 'NOT_STARTED'
-  | 'READY_TO_START'
-  | 'IN_PROGRESS'
-  | 'COMPLETED'
-  | 'BLOCKED';
+import { Trophy, GraduationCap, Home, Dumbbell, Sparkles } from 'lucide-react';
+import { getGuardianChildren, getEducationState, getLodgingState, getSportsState, getStatusMeta } from '@/lib/guardianDashboard';
 
-interface GuardianChild {
-  id: string;
-  name: string;
-  city: string;
-  location: string;
-  talentCategory: string;
-  totalCommitted: number;
-  totalReceived: number;
-  isFunded: boolean;
-  ngo: { name: string; region: string };
-  serviceRecord?: {
-    schoolStatus: ServiceStatus;
-    lodgingStatus: ServiceStatus;
-    activityStatus: ServiceStatus;
-    schoolName?: string | null;
-    lodgingDetails?: string | null;
-    activityDetails?: string | null;
-    notes?: string | null;
-  } | null;
-}
-
-interface DashboardPayload {
-  guardian: {
-    fullName: string;
-    region: string;
-    organizationName?: string | null;
-    specialties: string[];
-  };
-  summary: {
-    assignedChildren: number;
-    fundedChildren: number;
-    deliveryInProgress: number;
-  };
-  children: GuardianChild[];
-}
-
-const statusOptions: ServiceStatus[] = [
-  'NOT_STARTED',
-  'READY_TO_START',
-  'IN_PROGRESS',
-  'COMPLETED',
-  'BLOCKED',
-];
-
-const statusLabel: Record<ServiceStatus, string> = {
-  NOT_STARTED: 'Not started',
-  READY_TO_START: 'Ready to start',
-  IN_PROGRESS: 'In progress',
-  COMPLETED: 'Completed',
-  BLOCKED: 'Blocked',
-};
+const MOCK_GUARDIAN_ID = 'guardian1';
 
 export default function GuardianDashboard() {
-  const [data, setData] = useState<DashboardPayload | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [savingChildId, setSavingChildId] = useState<string | null>(null);
-  const [message, setMessage] = useState('');
-
-  useEffect(() => {
-    void fetchDashboard();
-  }, []);
-
-  const fetchDashboard = async () => {
-    try {
-      setLoading(true);
-      const response = await api.get('/guardian/dashboard');
-      setData(response.data);
-    } catch (error) {
-      console.error('Failed to load guardian dashboard', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleServiceUpdate = async (
-    childId: string,
-    field: 'schoolStatus' | 'lodgingStatus' | 'activityStatus',
-    value: ServiceStatus,
-  ) => {
-    try {
-      setSavingChildId(childId);
-      setMessage('');
-      await api.patch(`/guardian/services/${childId}`, { [field]: value });
-      setData((current) =>
-        current
-          ? {
-              ...current,
-              children: current.children.map((child) =>
-                child.id === childId
-                  ? {
-                      ...child,
-                      serviceRecord: {
-                        schoolStatus:
-                          child.serviceRecord?.schoolStatus ?? 'NOT_STARTED',
-                        lodgingStatus:
-                          child.serviceRecord?.lodgingStatus ?? 'NOT_STARTED',
-                        activityStatus:
-                          child.serviceRecord?.activityStatus ?? 'NOT_STARTED',
-                        schoolName: child.serviceRecord?.schoolName ?? null,
-                        lodgingDetails:
-                          child.serviceRecord?.lodgingDetails ?? null,
-                        activityDetails:
-                          child.serviceRecord?.activityDetails ?? null,
-                        notes: child.serviceRecord?.notes ?? null,
-                        [field]: value,
-                      },
-                    }
-                  : child,
-              ),
-            }
-          : current,
-      );
-      setMessage('Service delivery status updated.');
-    } catch (error) {
-      console.error('Failed to update guardian service', error);
-      setMessage('Failed to update the service status.');
-    } finally {
-      setSavingChildId(null);
-    }
-  };
-
-  if (loading) {
-    return (
-      <div className="flex justify-center p-16">
-        <Loader2 className="w-10 h-10 animate-spin text-amber-500" />
-      </div>
-    );
-  }
-
-  if (!data) {
-    return (
-      <div className="glass-card rounded-[2rem] p-8 text-slate-600 dark:text-slate-300">
-        Guardian dashboard is not available yet.
-      </div>
-    );
-  }
+  const children = getGuardianChildren(MOCK_GUARDIAN_ID);
 
   return (
     <div className="space-y-8">
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="glass-card rounded-[2rem] p-8 border-l-4 border-l-amber-500"
-      >
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+      <section className="overflow-hidden rounded-[2rem] bg-[radial-gradient(circle_at_top_left,_rgba(255,255,255,0.22),_transparent_38%),linear-gradient(135deg,_#0f172a,_#1d4ed8_55%,_#22c55e_140%)] p-8 text-white shadow-2xl shadow-slate-900/15">
+        <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
           <div>
-            <h2 className="text-3xl font-bold text-slate-900 dark:text-white flex items-center">
-              <div className="mr-4 flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 shadow-lg shadow-amber-500/30">
-                <Briefcase className="h-6 w-6 text-white" />
-              </div>
-              Guardian Delivery Desk
+            <div className="inline-flex items-center gap-2 rounded-full bg-white/12 px-4 py-2 text-sm font-semibold backdrop-blur">
+              <Sparkles className="h-4 w-4" />
+              Guardian Operations
+            </div>
+            <h2 className="mt-5 text-4xl font-black tracking-tight">
+              Assigned Children
             </h2>
-            <p className="mt-3 max-w-2xl text-slate-600 dark:text-slate-400 font-light">
-              {data.guardian.fullName} coordinates the funded services that turn sponsorship into real delivery on the ground.
-            </p>
-            <p className="mt-3 text-sm font-medium text-slate-500 dark:text-slate-400">
-              Region: {data.guardian.region}
-              {data.guardian.organizationName
-                ? ` • ${data.guardian.organizationName}`
-                : ''}
+            <p className="mt-3 max-w-2xl text-base text-blue-50/85">
+              Track every child&apos;s progress across education, lodging, and sports with a clean demo-ready guardian dashboard.
             </p>
           </div>
-          <div className="flex flex-wrap gap-3">
-            {data.guardian.specialties.map((specialty) => (
-              <span
-                key={specialty}
-                className="rounded-full bg-amber-100 px-4 py-2 text-sm font-semibold text-amber-800 dark:bg-amber-900/30 dark:text-amber-300"
+
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+            <StatPill label="Children" value={children.length} />
+            <StatPill
+              label="Education Ready"
+              value={
+                children.filter((child) => child.education.schoolFinalized).length
+              }
+            />
+            <StatPill
+              label="Sports Active"
+              value={children.filter((child) => child.sports.enrolled).length}
+            />
+          </div>
+        </div>
+      </section>
+
+      <section className="space-y-5">
+        <div className="flex items-center justify-between">
+          <h3 className="text-2xl font-bold text-slate-900 dark:text-white">
+            Assigned Children
+          </h3>
+          <span className="rounded-full bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-700 dark:bg-slate-800 dark:text-slate-200">
+            Guardian ID: {MOCK_GUARDIAN_ID}
+          </span>
+        </div>
+
+        {children.length === 0 ? (
+          <div className="rounded-[1.75rem] border border-dashed border-slate-300 bg-white/70 p-10 text-center text-slate-600 shadow-sm dark:border-slate-700 dark:bg-slate-900/50 dark:text-slate-300">
+            No assigned children found for this guardian.
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
+            {children.map((child) => (
+              <article
+                key={child.id}
+                className="rounded-[2rem] border border-slate-200/70 bg-white/90 p-6 shadow-xl shadow-slate-200/50 backdrop-blur-sm dark:border-slate-800 dark:bg-slate-900/70 dark:shadow-black/20"
               >
-                {specialty}
-              </span>
+                <div className="flex flex-col gap-4 border-b border-slate-200/80 pb-5 dark:border-slate-800">
+                  <div className="flex items-start justify-between gap-4">
+                    <div>
+                      <h4 className="text-2xl font-bold text-slate-900 dark:text-white">
+                        {child.name}
+                      </h4>
+                      <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
+                        Age {child.age} • {child.talent}
+                      </p>
+                    </div>
+                    <div className="rounded-2xl bg-slate-100 p-3 dark:bg-slate-800">
+                      <Trophy className="h-5 w-5 text-blue-600 dark:text-blue-300" />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-6 grid gap-5">
+                  <StatusSection
+                    title="Education"
+                    icon={<GraduationCap className="h-5 w-5 text-blue-600 dark:text-blue-300" />}
+                    items={[
+                      {
+                        label: 'School Finalized',
+                        state: getEducationState(child, 'schoolFinalized'),
+                      },
+                      {
+                        label: 'Fees Paid',
+                        state: getEducationState(child, 'feesPaid'),
+                      },
+                      {
+                        label: 'Attending',
+                        state: getEducationState(child, 'attending'),
+                      },
+                    ]}
+                  />
+
+                  <StatusSection
+                    title="Lodging"
+                    icon={<Home className="h-5 w-5 text-emerald-600 dark:text-emerald-300" />}
+                    items={[
+                      {
+                        label: 'Assigned',
+                        state: getLodgingState(child, 'assigned'),
+                      },
+                      {
+                        label: 'Active',
+                        state: getLodgingState(child, 'active'),
+                      },
+                    ]}
+                  />
+
+                  <StatusSection
+                    title="Sports"
+                    icon={<Dumbbell className="h-5 w-5 text-amber-600 dark:text-amber-300" />}
+                    items={[
+                      {
+                        label: 'Enrolled',
+                        state: getSportsState(child, 'enrolled'),
+                      },
+                      {
+                        label: 'Academy',
+                        state: getSportsState(child, 'academy'),
+                        value: child.sports.academy ?? 'Academy not assigned yet',
+                      },
+                    ]}
+                  />
+                </div>
+              </article>
             ))}
           </div>
-        </div>
-      </motion.div>
-
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-        <SummaryCard
-          icon={Sparkles}
-          label="Assigned Children"
-          value={data.summary.assignedChildren}
-          accent="text-amber-600"
-        />
-        <SummaryCard
-          icon={Target}
-          label="Funded Cases"
-          value={data.summary.fundedChildren}
-          accent="text-emerald-600"
-        />
-        <SummaryCard
-          icon={Briefcase}
-          label="Cases In Delivery"
-          value={data.summary.deliveryInProgress}
-          accent="text-blue-600"
-        />
-      </div>
-
-      {message ? (
-        <div className="rounded-2xl border border-slate-200 bg-white/70 px-4 py-3 text-sm font-medium text-slate-700 dark:border-slate-700 dark:bg-slate-900/50 dark:text-slate-200">
-          {message}
-        </div>
-      ) : null}
-
-      <div className="space-y-6">
-        {data.children.map((child) => (
-          <div key={child.id} className="glass-card rounded-3xl p-6">
-            <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-              <div>
-                <h3 className="text-2xl font-bold text-slate-900 dark:text-white">
-                  {child.name}
-                </h3>
-                <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
-                  {child.location}, {child.city} • Verified by {child.ngo.name}
-                </p>
-                <p className="mt-2 text-sm font-medium text-slate-600 dark:text-slate-300">
-                  {child.talentCategory} • Received ${child.totalReceived} of $
-                  {child.totalCommitted} committed
-                </p>
-              </div>
-              <span
-                className={`rounded-full px-4 py-2 text-sm font-semibold ${
-                  child.isFunded
-                    ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300'
-                    : 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300'
-                }`}
-              >
-                {child.isFunded ? 'Ready for service delivery' : 'Waiting for funds'}
-              </span>
-            </div>
-
-            <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-3">
-              <ServiceSelect
-                icon={GraduationCap}
-                label="Schooling"
-                value={child.serviceRecord?.schoolStatus ?? 'NOT_STARTED'}
-                disabled={savingChildId === child.id}
-                onChange={(value) =>
-                  handleServiceUpdate(child.id, 'schoolStatus', value)
-                }
-              />
-              <ServiceSelect
-                icon={Home}
-                label="Lodging"
-                value={child.serviceRecord?.lodgingStatus ?? 'NOT_STARTED'}
-                disabled={savingChildId === child.id}
-                onChange={(value) =>
-                  handleServiceUpdate(child.id, 'lodgingStatus', value)
-                }
-              />
-              <ServiceSelect
-                icon={Target}
-                label="Activities"
-                value={child.serviceRecord?.activityStatus ?? 'NOT_STARTED'}
-                disabled={savingChildId === child.id}
-                onChange={(value) =>
-                  handleServiceUpdate(child.id, 'activityStatus', value)
-                }
-              />
-            </div>
-          </div>
-        ))}
-      </div>
+        )}
+      </section>
     </div>
   );
 }
 
-function SummaryCard({
-  icon: Icon,
-  label,
-  value,
-  accent,
+function StatPill({ label, value }: { label: string; value: number }) {
+  return (
+    <div className="rounded-2xl border border-white/15 bg-white/10 px-4 py-3 backdrop-blur">
+      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-white/70">
+        {label}
+      </p>
+      <p className="mt-1 text-2xl font-bold text-white">{value}</p>
+    </div>
+  );
+}
+
+function StatusSection({
+  title,
+  icon,
+  items,
 }: {
-  icon: ComponentType<{ className?: string }>;
-  label: string;
-  value: number;
-  accent: string;
+  title: string;
+  icon: React.ReactNode;
+  items: Array<{ label: string; state: 'completed' | 'in-progress' | 'pending'; value?: string }>;
 }) {
   return (
-    <div className="glass-card rounded-3xl p-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
-            {label}
-          </p>
-          <p className="mt-2 text-3xl font-bold text-slate-900 dark:text-white">
+    <section className="rounded-[1.5rem] bg-slate-50 p-5 dark:bg-slate-950/70">
+      <div className="mb-4 flex items-center gap-3">
+        <div className="rounded-xl bg-white p-2 shadow-sm dark:bg-slate-900">
+          {icon}
+        </div>
+        <h5 className="text-lg font-bold text-slate-900 dark:text-white">
+          {title}
+        </h5>
+      </div>
+
+      <div className="space-y-3">
+        {items.map((item) => (
+          <StatusRow
+            key={item.label}
+            label={item.label}
+            state={item.state}
+            value={item.value}
+          />
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function StatusRow({
+  label,
+  state,
+  value,
+}: {
+  label: string;
+  state: 'completed' | 'in-progress' | 'pending';
+  value?: string;
+}) {
+  const meta = getStatusMeta(state);
+
+  return (
+    <div className="flex flex-col gap-3 rounded-2xl bg-white px-4 py-3 shadow-sm dark:bg-slate-900 sm:flex-row sm:items-center sm:justify-between">
+      <div>
+        <p className="text-sm font-semibold text-slate-900 dark:text-white">
+          {label}
+        </p>
+        {value ? (
+          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
             {value}
           </p>
-        </div>
-        <div className="rounded-2xl bg-slate-100 p-3 dark:bg-slate-800">
-          <Icon className={`h-6 w-6 ${accent}`} />
-        </div>
+        ) : null}
       </div>
-    </div>
-  );
-}
-
-function ServiceSelect({
-  icon: Icon,
-  label,
-  value,
-  onChange,
-  disabled,
-}: {
-  icon: ComponentType<{ className?: string }>;
-  label: string;
-  value: ServiceStatus;
-  onChange: (value: ServiceStatus) => void;
-  disabled: boolean;
-}) {
-  return (
-    <label className="rounded-2xl border border-slate-200 bg-white/60 p-4 dark:border-slate-700 dark:bg-slate-900/50">
-      <div className="mb-3 flex items-center gap-3">
-        <div className="rounded-xl bg-slate-100 p-2 dark:bg-slate-800">
-          <Icon className="h-4 w-4 text-slate-700 dark:text-slate-200" />
-        </div>
-        <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">
-          {label}
-        </span>
-      </div>
-      <select
-        value={value}
-        disabled={disabled}
-        onChange={(event) => onChange(event.target.value as ServiceStatus)}
-        className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 outline-none focus:ring-2 focus:ring-amber-500 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
+      <span
+        className={`inline-flex items-center gap-2 rounded-full px-3 py-2 text-sm font-semibold ${meta.className}`}
       >
-        {statusOptions.map((option) => (
-          <option key={option} value={option}>
-            {statusLabel[option]}
-          </option>
-        ))}
-      </select>
-    </label>
+        <span>{meta.icon}</span>
+        {meta.label}
+      </span>
+    </div>
   );
 }
