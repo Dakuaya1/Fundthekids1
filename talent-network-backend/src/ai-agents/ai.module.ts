@@ -25,9 +25,10 @@ import { PaymentsTool } from './tools/payments.tool';
 import { ReportsTool } from './tools/reports.tool';
 import { SponsorshipTool } from './tools/sponsorship.tool';
 import { ImpactGraphWorkflow } from './workflows/impact.graph';
+import { GuardianModule } from '../modules/guardian/guardian.module';
 
 @Module({
-  imports: [ScheduleModule.forRoot()],
+  imports: [ScheduleModule.forRoot(), GuardianModule],
   controllers: [AiController],
   providers: [
     PrismaService,
