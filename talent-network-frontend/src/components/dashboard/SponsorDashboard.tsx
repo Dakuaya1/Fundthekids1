@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import api from '@/lib/api';
 import { motion, Variants, AnimatePresence } from 'framer-motion';
 import { Heart, Loader2, Star, BookOpen, GraduationCap, Sparkles, School, Trophy, Medal } from 'lucide-react';
+import { getGuardianGalleryChildren, mergeChildrenWithGuardianProfiles } from '@/lib/mockGuardianProfiles';
 
 interface Child {
     id: string;
@@ -10,6 +11,7 @@ interface Child {
     talentCategory: string;
     aiSummary?: string;
     ngo: { name: string; region: string };
+    isMockProfile?: boolean;
 }
 
 interface SponsorScore {
@@ -45,6 +47,8 @@ export default function SponsorDashboard() {
     }, []);
 
     const fetchDashboardData = async () => {
+        const mockChildren = getGuardianGalleryChildren();
+
         try {
             setLoading(true);
             setFetchError('');
@@ -57,9 +61,9 @@ export default function SponsorDashboard() {
             const [childrenRes, leaderboardRes, weekRes] = results;
 
             if (childrenRes.status === 'fulfilled') {
-                setChildren(childrenRes.value.data);
+                setChildren(mergeChildrenWithGuardianProfiles(childrenRes.value.data as Child[], mockChildren));
             } else {
-                setChildren([]);
+                setChildren(mockChildren);
                 console.warn('Failed to load children data');
             }
 
@@ -78,7 +82,7 @@ export default function SponsorDashboard() {
             }
 
             // Show a generic error only if the primary content (children) fails
-            if (childrenRes.status === 'rejected') {
+            if (childrenRes.status === 'rejected' && mockChildren.length === 0) {
                 setFetchError('Failed to load main dashboard data. Please try again.');
             }
         } catch {
@@ -98,6 +102,15 @@ export default function SponsorDashboard() {
         setSuccessMsg('');
 
         try {
+            if (selectedChild.isMockProfile) {
+                setSuccessMsg(`Successfully sponsored ${selectedChild.name}!`);
+                setTimeout(() => {
+                    setSelectedChild(null);
+                    setSuccessMsg('');
+                }, 2500);
+                return;
+            }
+
             const res = await api.post('/sponsorships/plan', {
                 childId: selectedChild.id,
                 category: planCategory,

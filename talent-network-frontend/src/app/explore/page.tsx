@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Heart, Loader2, PlayCircle, MapPin, School, ChevronLeft, ChevronRight, Search, CheckCircle2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
+import { getGuardianGalleryChildren, mergeChildrenWithGuardianProfiles } from '@/lib/mockGuardianProfiles';
 
 interface Child {
     id: string;
@@ -19,6 +20,7 @@ interface Child {
     pleaVideoUrl?: string;
     mediaUrls?: string[];
     ngo: { name: string; region: string };
+    isMockProfile?: boolean;
 }
 
 function resolvePleaVideoUrl(child: Child) {
@@ -41,15 +43,22 @@ export default function ExplorePage() {
     }, []);
 
     const fetchChildren = async () => {
+        const mockChildren = getGuardianGalleryChildren();
+
         try {
             setLoading(true);
             setFetchError('');
             const res = await api.get('/children');
+            const apiChildren = res.data as Child[];
             // Mock or random sort to simulate "explore" feel
-            setChildren(res.data.sort(() => Math.random() - 0.5));
+            setChildren(mergeChildrenWithGuardianProfiles(apiChildren, mockChildren).sort(() => Math.random() - 0.5));
         } catch (err: unknown) {
             console.error('Failed to fetch children for explore:', err);
-            setFetchError('Failed to load the gallery. Please try again.');
+            if (mockChildren.length > 0) {
+                setChildren(mockChildren.sort(() => Math.random() - 0.5));
+            } else {
+                setFetchError('Failed to load the gallery. Please try again.');
+            }
         } finally {
             setLoading(false);
         }
@@ -160,6 +169,15 @@ function KidCard({ child, isAuthenticated, router }: { child: Child, isAuthentic
         setSuccessMsg('');
 
         try {
+            if (child.isMockProfile) {
+                setIsSupporting(true);
+                setSuccessMsg('Thank you for supporting this child');
+                setTimeout(() => {
+                    setIsModalOpen(false);
+                }, 1200);
+                return;
+            }
+
             const res = await api.post('/sponsorships/pledge', {
                 childId: child.id,
                 amount: Number(amount)
