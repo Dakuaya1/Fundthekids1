@@ -16,7 +16,7 @@ export class UsersService {
       ? data.passwordHash
       : await bcrypt.hash(data.passwordHash, saltOrRounds);
 
-    return this.prisma.$transaction(async (tx) => {
+    const user = await this.prisma.$transaction(async (tx) => {
       const user = await tx.user.create({
         data: { ...data, passwordHash },
       });
@@ -33,26 +33,30 @@ export class UsersService {
         await tx.volunteer.create({
           data: { userId: user.id, assignedRegion: 'Global' },
         });
-      } else if (user.role === Role.GUARDIAN) {
-        try {
-          await tx.guardian.create({
-            data: {
-              userId: user.id,
-              fullName: user.email.split('@')[0],
-              region: 'Global',
-              specialties: ['Education', 'Lodging', 'Student Support'],
-            },
-          });
-        } catch (error) {
-          this.logger.warn(
-            'Guardian profile creation skipped because the database is not yet migrated for guardian records.',
-          );
-          this.logger.debug(String(error));
-        }
       }
 
       return user;
     });
+
+    if (user.role === Role.GUARDIAN) {
+      try {
+        await this.prisma.guardian.create({
+          data: {
+            userId: user.id,
+            fullName: user.email.split('@')[0],
+            region: 'Global',
+            specialties: ['Education', 'Lodging', 'Student Support'],
+          },
+        });
+      } catch (error) {
+        this.logger.warn(
+          'Guardian profile creation skipped because the database is not yet migrated for guardian records.',
+        );
+        this.logger.debug(String(error));
+      }
+    }
+
+    return user;
   }
 
   async findAll() {

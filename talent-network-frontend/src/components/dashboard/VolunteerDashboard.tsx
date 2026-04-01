@@ -35,7 +35,9 @@ export default function VolunteerDashboard() {
             setLoading(true);
             const response = await api.get('/volunteer/region-children');
             const apiChildren = response.data as AssignedChild[];
-            if (apiChildren.length > 0) {
+            const pendingApiTasks = apiChildren.filter(child => child.reports.length > 0);
+
+            if (pendingApiTasks.length > 0) {
                 setChildren(apiChildren);
                 setIsUsingMockData(false);
             } else {
