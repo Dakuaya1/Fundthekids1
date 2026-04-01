@@ -1,10 +1,12 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../../config/prisma.service';
 import { Role } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UsersService {
+  private readonly logger = new Logger(UsersService.name);
+
   constructor(private prisma: PrismaService) {}
 
   async create(data: { email: string; passwordHash: string; role: Role }) {
@@ -32,14 +34,21 @@ export class UsersService {
           data: { userId: user.id, assignedRegion: 'Global' },
         });
       } else if (user.role === Role.GUARDIAN) {
-        await tx.guardian.create({
-          data: {
-            userId: user.id,
-            fullName: user.email.split('@')[0],
-            region: 'Global',
-            specialties: ['Education', 'Lodging', 'Student Support'],
-          },
-        });
+        try {
+          await tx.guardian.create({
+            data: {
+              userId: user.id,
+              fullName: user.email.split('@')[0],
+              region: 'Global',
+              specialties: ['Education', 'Lodging', 'Student Support'],
+            },
+          });
+        } catch (error) {
+          this.logger.warn(
+            'Guardian profile creation skipped because the database is not yet migrated for guardian records.',
+          );
+          this.logger.debug(String(error));
+        }
       }
 
       return user;
@@ -47,43 +56,66 @@ export class UsersService {
   }
 
   async findAll() {
-    return this.prisma.user.findMany({
-      select: {
-        id: true,
-        email: true,
-        role: true,
-        createdAt: true,
-        guardian: {
-          select: {
-            fullName: true,
-            region: true,
-            organizationName: true,
-            isAvailable: true,
+    try {
+      return await this.prisma.user.findMany({
+        select: {
+          id: true,
+          email: true,
+          role: true,
+          createdAt: true,
+          guardian: {
+            select: {
+              fullName: true,
+              region: true,
+              organizationName: true,
+              isAvailable: true,
+            },
           },
         },
-      },
-    });
+      });
+    } catch (error) {
+      this.logger.warn(
+        'Falling back to basic user list because guardian tables are unavailable.',
+      );
+      this.logger.debug(String(error));
+
+      return this.prisma.user.findMany({
+        select: { id: true, email: true, role: true, createdAt: true },
+      });
+    }
   }
 
   async findOne(id: string) {
-    return this.prisma.user.findUnique({
-      where: { id },
-      select: {
-        id: true,
-        email: true,
-        role: true,
-        createdAt: true,
-        guardian: {
-          select: {
-            fullName: true,
-            region: true,
-            organizationName: true,
-            specialties: true,
-            isAvailable: true,
+    try {
+      return await this.prisma.user.findUnique({
+        where: { id },
+        select: {
+          id: true,
+          email: true,
+          role: true,
+          createdAt: true,
+          guardian: {
+            select: {
+              fullName: true,
+              region: true,
+              organizationName: true,
+              specialties: true,
+              isAvailable: true,
+            },
           },
         },
-      },
-    });
+      });
+    } catch (error) {
+      this.logger.warn(
+        'Falling back to basic user profile because guardian tables are unavailable.',
+      );
+      this.logger.debug(String(error));
+
+      return this.prisma.user.findUnique({
+        where: { id },
+        select: { id: true, email: true, role: true, createdAt: true },
+      });
+    }
   }
 
   async findByEmail(email: string) {

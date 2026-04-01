@@ -1,8 +1,11 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../config/prisma.service';
+import { Logger } from '@nestjs/common';
 
 @Injectable()
 export class AdminService {
+  private readonly logger = new Logger(AdminService.name);
+
   constructor(private prisma: PrismaService) {}
 
   async getSystemMetrics() {
@@ -39,29 +42,53 @@ export class AdminService {
 
     const whereClause = role ? { role: role as any } : {};
 
-    const users = await this.prisma.user.findMany({
-      where: whereClause,
-      take: Number(limit),
-      skip: Number(offset),
-      orderBy: { createdAt: 'desc' },
-      select: {
-        id: true,
-        email: true,
-        role: true,
-        createdAt: true,
-        // Do not fetch passwordHash
-        ngo: { select: { verifiedStatus: true, name: true, region: true } },
-        sponsor: { select: { impactScore: true, leaderboardRank: true } },
-        guardian: {
-          select: {
-            fullName: true,
-            region: true,
-            organizationName: true,
-            isAvailable: true,
+    let users;
+
+    try {
+      users = await this.prisma.user.findMany({
+        where: whereClause,
+        take: Number(limit),
+        skip: Number(offset),
+        orderBy: { createdAt: 'desc' },
+        select: {
+          id: true,
+          email: true,
+          role: true,
+          createdAt: true,
+          // Do not fetch passwordHash
+          ngo: { select: { verifiedStatus: true, name: true, region: true } },
+          sponsor: { select: { impactScore: true, leaderboardRank: true } },
+          guardian: {
+            select: {
+              fullName: true,
+              region: true,
+              organizationName: true,
+              isAvailable: true,
+            },
           },
         },
-      },
-    });
+      });
+    } catch (error) {
+      this.logger.warn(
+        'Falling back to admin user list without guardian details because guardian tables are unavailable.',
+      );
+      this.logger.debug(String(error));
+
+      users = await this.prisma.user.findMany({
+        where: whereClause,
+        take: Number(limit),
+        skip: Number(offset),
+        orderBy: { createdAt: 'desc' },
+        select: {
+          id: true,
+          email: true,
+          role: true,
+          createdAt: true,
+          ngo: { select: { verifiedStatus: true, name: true, region: true } },
+          sponsor: { select: { impactScore: true, leaderboardRank: true } },
+        },
+      });
+    }
 
     const total = await this.prisma.user.count({ where: whereClause });
 

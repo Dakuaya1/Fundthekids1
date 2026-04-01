@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import api from '@/lib/api';
 import { motion, Variants } from 'framer-motion';
 import { ShieldCheck, Calendar, FileText, CheckCircle2, XCircle, Loader2 } from 'lucide-react';
+import { getVolunteerTasks } from '@/lib/volunteerDashboard';
 
 interface ProgressReport {
     id: string;
@@ -21,24 +22,45 @@ interface AssignedChild {
 export default function VolunteerDashboard() {
     const [children, setChildren] = useState<AssignedChild[]>([]);
     const [loading, setLoading] = useState(true);
+    const [isUsingMockData, setIsUsingMockData] = useState(false);
 
     useEffect(() => {
         fetchRegionTasks();
     }, []);
 
     const fetchRegionTasks = async () => {
+        const mockTasks = getVolunteerTasks();
+
         try {
             setLoading(true);
             const response = await api.get('/volunteer/region-children');
-            setChildren(response.data);
+            const apiChildren = response.data as AssignedChild[];
+            if (apiChildren.length > 0) {
+                setChildren(apiChildren);
+                setIsUsingMockData(false);
+            } else {
+                setChildren(mockTasks);
+                setIsUsingMockData(true);
+            }
         } catch (error) {
             console.error('Failed to fetch volunteer regional tasks', error);
+            setChildren(mockTasks);
+            setIsUsingMockData(true);
         } finally {
             setLoading(false);
         }
     };
 
     const handleVerifyReport = async (reportId: string, status: 'VERIFIED' | 'REJECTED') => {
+        if (isUsingMockData) {
+            setChildren(prev => prev.map(child => ({
+                ...child,
+                reports: child.reports.filter(r => r.id !== reportId)
+            })));
+            alert(status === 'VERIFIED' ? 'Mock report marked as reviewed. Demo queue updated.' : 'Mock report rejected for follow-up.');
+            return;
+        }
+
         try {
             await api.post(`/volunteer/verify-report/${reportId}`, { status });
             // Optimistically update UI
@@ -91,6 +113,11 @@ export default function VolunteerDashboard() {
                     <p className="text-slate-600 dark:text-slate-400 mt-2 font-light max-w-xl">
                         Review children and pending reports from your assigned region. Mark reports as reviewed to keep the verification queue moving.
                     </p>
+                    {isUsingMockData && (
+                        <p className="mt-3 text-sm font-medium text-emerald-700 dark:text-emerald-300">
+                            Demo mode is active. Showing mock volunteer review tasks for the product walkthrough.
+                        </p>
+                    )}
                 </div>
                 <div className="text-right">
                     <span className="inline-flex items-center px-4 py-2 rounded-full text-sm font-bold bg-emerald-100/50 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 backdrop-blur-sm">
